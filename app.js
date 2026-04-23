@@ -35,7 +35,7 @@ const CONFIG_EMAIL = {
    Cambiá el día aquí (actualmente: día 22 de cada mes)
    ──────────────────────────────────────────────── */
 const CONFIG_TEMPORIZADOR = {
-  DIA_REINICIO: 22,
+  DIA_REINICIO: 29,
 };
 
 /* ────────────────────────────────────────────────
@@ -112,7 +112,7 @@ const CUPONES_SEXY = [
 
 
 const CUPONES_GAMER = [
-  { emoji: "🎮", titulo: "Cupón para una noche de Dragon Ball Online", descripcion: "A las 8 nos levantamos a jugar. Seré tu healer, tu support, lo que necesites.",              efecto: "efecto-brillo"  },
+  { emoji: "🎮", titulo: "Cupón para una noche de Dragon Ball Online", descripcion: "A las 8 nos levantamos a jugar. Seré tu healer(no), tu support(no), lo que necesites.",              efecto: "efecto-brillo"  },
   { emoji: "🏆", titulo: "Cupón para elegir el juego",                 descripcion: "Tu elección, sin discusión. Esa noche mandás vos.",                                            efecto: "efecto-sparkle" },
   { emoji: "🕹️", titulo: "Cupón para modo co-op",                      descripcion: "Un juego para dos. Somos el mejor equipo del mundo.",                                          efecto: ""               },
   { emoji: "⚔️", titulo: "Cupón para raid especial",                   descripcion: "Nos quedamos despiertos hasta ganarlo. Sin rendirnos.",                                        efecto: "efecto-brillo"  },
@@ -144,19 +144,47 @@ Si esto lo estás leyendo, es porque sos exactamente la persona para quien lo es
 
 Eres mi primera generación. Mi única generación. La persona con la que quiero todas las aventuras — las del juego y las de verdad.
 
-No hay código de trampa que te describa. Sos el unlock más importante de mi vida.`,
+No hay panel de lookism que te describa. Sos el unlock más importante de mi vida.`,
   },
   papoy: {
     titulo: "🐾 Papoy te amo",
     texto: `Papoyyy 💕
 
-Eres tan linda que a veces no lo puedo creer.
+Sos tan linda que a veces no lo puedo creer.
 
 Gracias por existir, por tus trolleos, por dejarme quererte, por las noches jugando, por los abrazos que no terminan nunca.
 
 Sos mi papoy favorita del universo entero.
 
 Te amo muchísimo.`,
+  },
+  wife: {
+    titulo: "🔓 WIFE MODE ACTIVADO ",
+    texto: `Advertencia: este mensaje puede causar sonrisas permanentes, apego emocional y planes de futuro con vos. 😌❤️
+
+No es solo una idea romántica, es una decisión silenciosa que tengo hace rato.
+Quiero que seas vos. En los días buenos, en los difíciles, en todo.
+Y aunque todavía no sea “oficial”, en mi cabeza ya lo es hace tiempo.
+
+
+Nivel de amor: infinito.
+Estado actual: te estoy eligiendo en todas las realidades posibles 💍❤️`,
+  },
+  Kin: {
+    titulo: "Vos 🌸",
+    texto: `No sos una parte de mi vida. Sos el motivo por el que muchas cosas tienen sentido.
+
+Antes de vos, todo era normal… después de vos, todo tiene intención.
+Hasta lo simple se siente distinto si estás en eso.
+
+No sé explicarlo bien, pero me pasa algo raro:
+te pienso y se me acomoda el mundo, a la inversa tambien jjeje.`,
+  },
+  Negros: {
+    titulo: "?",
+    texto: `❓
+
+`,
   },
 };
 
@@ -168,6 +196,9 @@ Te amo muchísimo.`,
 const CONTRASENAS_SECRETAS = {
   "legend of the first generation": "james",
   "papoy":                          "papoy",
+  "wife":                           "wife",
+  "kin":                            "Kin",
+  "negros":                         "Negros",
   "modo gamer":                     "gamer",   // especial: activa modo gamer
   "reset cupones":                  "reset",   // especial: resetea todos los canjeados
 };
