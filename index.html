@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cupones de Amor 💌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- BANNER GAMER (visible solo en modo gamer) -->
+  <div class="gamer-banner">🎮 GAMER MODE ACTIVATED — PLAYER 2 HAS ENTERED THE GAME ♥</div>
+
+  <!-- FRASES FLOTANTES DE FONDO -->
+  <div class="fondo-frases" id="fondo-frases"></div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="contenedor">
+
+    <!-- FRASE ALEATORIA -->
+    <div class="frase-aleatoria" id="frase-aleatoria"></div>
+
+    <!-- HEADER -->
+    <header>
+      <div class="subtitulo-header">Para vos, con todo mi amor</div>
+      <h1>Cupones de <em>Amor</em></h1>
+      <div class="linea-dec">
+        <span class="corazon-secreto" id="corazon-secreto">♥</span>
+      </div>
+      <div class="campo-secreto-wrap" id="campo-secreto-wrap">
+        <input class="campo-secreto" id="campo-secreto" type="text" placeholder="contraseña secreta..." autocomplete="off" spellcheck="false">
+      </div>
+    </header>
+
+    <!-- TEMPORIZADOR -->
+    <div class="temporizador-widget">
+      <div class="temp-titulo">Próximo reinicio de cupones</div>
+      <div class="temp-countdown" id="temp-countdown">--</div>
+      <div class="temp-subtexto" id="temp-subtexto"></div>
+      <div class="temp-barra-wrap">
+        <div class="temp-barra" id="temp-barra" style="width:100%"></div>
+      </div>
+    </div>
+
+    <!-- TABS / FILTROS -->
+    <div class="tabs">
+      <button class="tab activo" data-filtro="todos">Todos 💌</button>
+      <button class="tab" data-filtro="normales">Románticos</button>
+      <button class="tab" data-filtro="disponibles">Disponibles</button>
+      <button class="tab" data-filtro="canjeados">Canjeados</button>
+      <button class="tab tab-sexy" data-filtro="sexy">🔥 Sexy</button>
+      <button class="tab tab-gamer" id="tab-gamer" data-filtro="gamer">🎮 Gamer</button>
+    </div>
+
+    <!-- CONTADOR -->
+    <div class="contador" id="contador"></div>
+
+    <!-- GRILLA DE CUPONES -->
+    <div class="grilla" id="grilla"></div>
+
+  </div><!-- /contenedor -->
+
+
+  <!-- ── BOTÓN MÚSICA ── -->
+  <div class="musica-widget">
+    <button class="btn-musica" id="btn-musica" title="Música">🎵</button>
+  </div>
+  <div class="onda"></div>
+  <div class="onda"></div>
+  <div class="onda"></div>
+
+  <!-- ── MINI CHAT ── -->
+  <button class="btn-chat-toggle" id="btn-chat-toggle" title="Chat">💬</button>
+  <div class="mini-chat" id="mini-chat">
+    <div class="chat-titulo">
+      <span>chat ♥</span>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <span class="chat-titulo-punto"></span>
+        <button class="btn-chat-cerrar" id="btn-chat-cerrar">✕</button>
+      </div>
+    </div>
+    <div class="chat-mensajes" id="chat-mensajes"></div>
+  </div>
+
+  <!-- ── AUDIO ── -->
+  <audio id="audio" loop><source src="cancion.mp3" type="audio/mpeg"></audio>
+  <audio id="audio-gamer" loop><source src="cancion-gamer.mp3" type="audio/mpeg"></audio>
+  <audio id="audio-check"><source src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" type="audio/mpeg"></audio>
+  <audio id="audio-unlock"><source src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3" type="audio/mpeg"></audio>
+
+  <audio id="audio-msg" src="sounds/mensaje.mp3" type="audio/mpeg"></audio>
+  <!-- ── MODAL CANJE ── -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="modal-emoji" id="modal-emoji">💌</div>
+      <div class="modal-titulo" id="modal-titulo">¿Canjeás este cupón?</div>
+      <div class="modal-subtitulo" id="modal-subtitulo">Se va a marcar como usado y me va a llegar una notificación.</div>
+      <div class="modal-botones">
+        <button class="btn-cancelar" id="btn-cancelar">No, todavía no</button>
+        <button class="btn-confirmar" id="btn-confirmar">¡Sí, canjear!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL SECRETO ── -->
+  <div class="overlay-secreto" id="overlay-secreto">
+    <div class="modal-secreto">
+      <div class="particulas-secreto" id="particulas-secreto"></div>
+      <div class="secreto-titulo" id="secreto-titulo">✨ Mensaje Secreto ✨</div>
+      <div class="secreto-texto" id="secreto-texto"></div>
+      <button class="btn-cerrar-secreto" id="btn-cerrar-secreto">💖 Cerrar</button>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
