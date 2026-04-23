@@ -35,7 +35,7 @@ const CONFIG_EMAIL = {
    Cambiá el día aquí (actualmente: día 22 de cada mes)
    ──────────────────────────────────────────────── */
 const CONFIG_TEMPORIZADOR = {
-  DIA_REINICIO: 29,
+  DIA_REINICIO: 22,
 };
 
 /* ────────────────────────────────────────────────
