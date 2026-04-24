@@ -1327,3 +1327,142 @@ body.gamer-mode .vale.efecto-pixels::after,
 body.gamer-mode .vale.efecto-berenjenas::after {
   display: none;
 }
+
+/* ─── CONTADOR DÍAS JUNTOS ──────────────────────── */
+.dias-juntos {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+  margin-bottom: 0.5rem;
+  transition: color 0.5s;
+}
+.dias-juntos span {
+  font-weight: 700;
+  color: var(--rosa-oscuro);
+  font-size: 1.1rem;
+  transition: color 0.5s;
+}
+body.gamer-mode .dias-juntos { color: rgba(0,255,204,0.6); font-style: normal; font-family: 'Press Start 2P', cursive; font-size: 0.5rem; line-height: 2; }
+body.gamer-mode .dias-juntos span { color: var(--gamer-accent); }
+body.sexy-mode .dias-juntos { color: rgba(255,128,170,0.7); }
+body.sexy-mode .dias-juntos span { color: var(--sexy-accent); }
+
+
+
+/* ─── 23. PANTALLA DE BIENVENIDA ───────────────── */
+.bienvenida-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #fdf6f0 0%, #fce8f0 50%, #f5e8d8 100%);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.bienvenida-overlay.saliendo {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+.bienvenida-overlay.oculto { display: none; }
+
+.bienvenida-card {
+  text-align: center;
+  position: relative;
+  animation: bienvenidaEntrada 1s cubic-bezier(.175,.885,.32,1.275) forwards;
+}
+@keyframes bienvenidaEntrada {
+  from { opacity: 0; transform: translateY(30px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.bienvenida-corazones {
+  position: absolute;
+  inset: -60px;
+  pointer-events: none;
+  overflow: visible;
+}
+.bienvenida-corazon-flotante {
+  position: absolute;
+  font-size: 1.2rem;
+  animation: bienvenidaCorazonFlota linear infinite;
+  opacity: 0;
+}
+@keyframes bienvenidaCorazonFlota {
+  0%   { transform: translateY(0) rotate(0deg);    opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-120px) rotate(20deg); opacity: 0; }
+}
+
+.bienvenida-emoji {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bienvenidaEmoji 2s ease-in-out infinite;
+}
+@keyframes bienvenidaEmoji {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50%       { transform: scale(1.12) rotate(3deg); }
+}
+
+.bienvenida-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 400;
+  color: var(--texto);
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.bienvenida-subtitulo {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
+  color: var(--texto-suave);
+  margin-bottom: 1rem;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.bienvenida-dias {
+  font-size: 0.82rem;
+  color: var(--rosa-oscuro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  font-family: 'Lato', sans-serif;
+}
+
+.bienvenida-btn {
+  background: linear-gradient(135deg, var(--rosa), var(--rosa-oscuro));
+  border: none;
+  border-radius: 50px;
+  padding: 0.9rem 2.5rem;
+  color: #fff;
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 24px rgba(194,110,138,0.4);
+  animation: pulsoBtn 2.5s ease-in-out infinite 1s;
+}
+.bienvenida-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 10px 32px rgba(194,110,138,0.6);
+}
+@keyframes pulsoBtn {
+  0%, 100% { box-shadow: 0 6px 24px rgba(194,110,138,0.4); }
+  50%       { box-shadow: 0 6px 36px rgba(194,110,138,0.7); }
+}
+
+/* modo gamer */
+body.gamer-mode .bienvenida-overlay { background: linear-gradient(135deg, #0a0a1a, #0d0d2b); }
+body.gamer-mode .bienvenida-titulo  { color: var(--gamer-accent); text-shadow: 0 0 20px var(--gamer-accent); }
+body.gamer-mode .bienvenida-subtitulo { color: rgba(0,255,204,0.7); }
+body.gamer-mode .bienvenida-dias    { color: var(--gamer-pink); }
+body.gamer-mode .bienvenida-btn     { background: linear-gradient(135deg, var(--gamer-purple), var(--gamer-pink)); }

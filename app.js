@@ -1230,3 +1230,95 @@ crearFraseFondo();
    INICIO
    ══════════════════════════════════════════════ */
 renderGrilla();
+
+/* ══════════════════════════════════════════════
+   CONTADOR DÍAS JUNTOS
+   ══════════════════════════════════════════════ */
+(function() {
+  // ✏️ CAMBIÁ esta fecha por la fecha real en que empezaron
+  const FECHA_INICIO = new Date("2025-09-29");
+
+  const el = document.getElementById("dias-juntos");
+  if (!el) return;
+
+  function actualizar() {
+    const hoy  = new Date();
+    const diff = Math.floor((hoy - FECHA_INICIO) / (1000 * 60 * 60 * 24));
+    const años  = Math.floor(diff / 365);
+    const meses = Math.floor((diff % 365) / 30);
+    const dias  = diff % 30;
+
+    let texto = "";
+    if (años > 0)  texto += `${años} año${años > 1 ? "s" : ""}, `;
+    if (meses > 0) texto += `${meses} mes${meses > 1 ? "es" : ""} y `;
+    texto += `${dias} día${dias !== 1 ? "s" : ""}`;
+
+    el.innerHTML = `juntos hace <span>${texto}</span> ♥`;
+  }
+
+  actualizar();
+  setInterval(actualizar, 60000);
+})();
+
+
+
+/* ══════════════════════════════════════════════
+   PANTALLA DE BIENVENIDA (una vez por día)
+   ══════════════════════════════════════════════ */
+(function() {
+  const HOY   = new Date().toDateString();
+  const KEY   = "bienvenida_vista";
+  const visto = localStorage.getItem(KEY);
+  const overlay = document.getElementById("bienvenida-overlay");
+  if (!overlay) return;
+
+  // Si ya la vio hoy, la ocultamos directo
+  if (visto === HOY) {
+    overlay.classList.add("oculto");
+    return;
+  }
+
+  // Frases de bienvenida aleatorias
+  const frasesBienvenida = [
+    "Cada vez que abrís esto, pienso en vos.",
+    "Estos cupones son todos tuyos, como yo.",
+    "Hoy también es un buen día para quererte.",
+    "Acá están tus cupones, úsalos cuando quieras.",
+    "Gracias por existir en mi mundo.",
+    "Sos mi favorita, por si no te lo dije hoy.",
+  ];
+
+  // Frase
+  const fraseEl2 = document.getElementById("bienvenida-frase");
+  if (fraseEl2) fraseEl2.textContent = frasesBienvenida[Math.floor(Math.random() * frasesBienvenida.length)];
+
+  // Días juntos
+  const FECHA_INICIO = new Date("2025-09-29");
+  const diasEl = document.getElementById("bienvenida-dias");
+  if (diasEl) {
+    const diff = Math.floor((new Date() - FECHA_INICIO) / (1000 * 60 * 60 * 24));
+    diasEl.textContent = `${diff} días juntos ♥`;
+  }
+
+  // Corazones flotantes
+  const cont = document.getElementById("bienvenida-corazones");
+  if (cont) {
+    ["♥","♡","💕","✨","🌸"].forEach((emoji, i) => {
+      const h = document.createElement("span");
+      h.className   = "bienvenida-corazon-flotante";
+      h.textContent = emoji;
+      h.style.left             = (10 + i * 18) + "%";
+      h.style.bottom           = "0";
+      h.style.animationDuration = (3 + i * 0.8) + "s";
+      h.style.animationDelay   = (i * 0.5) + "s";
+      cont.appendChild(h);
+    });
+  }
+
+  // Botón cerrar
+  document.getElementById("bienvenida-btn").addEventListener("click", () => {
+    overlay.classList.add("saliendo");
+    localStorage.setItem(KEY, HOY);
+    setTimeout(() => overlay.classList.add("oculto"), 800);
+  });
+})();
