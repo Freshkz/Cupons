@@ -600,19 +600,33 @@ function idCupon(v) {
 
 let canjeados = JSON.parse(localStorage.getItem("cupones_canjeados_v3") || "{}");
 
+// REEMPLAZÁ la función cargarCanjeados() completa por esta:
 async function cargarCanjeados() {
+  // 1. Render inmediato con localStorage (sin esperar red)
+  renderGrilla();
+
+  // 2. JSONBin con timeout de 3 segundos
   try {
-    const res = await fetch(JSONBIN_URL + "/latest", {
+    const fetchPromise = fetch(JSONBIN_URL + "/latest", {
       headers: { "X-Master-Key": CONFIG_SYNC.API_KEY }
     });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), 3000)
+    );
+
+    const res  = await Promise.race([fetchPromise, timeoutPromise]);
     const data = await res.json();
     const remoto = data.record || {};
-    // Mergear local + remoto (el remoto gana)
+
+    // Solo re-renderiza si el remoto tiene diferencias reales
+    const hayDiferencias = Object.keys(remoto).some(k => !canjeados[k]);
     Object.assign(canjeados, remoto);
     localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
-    renderGrilla();
+    if (hayDiferencias) renderGrilla();
+
   } catch (err) {
-    console.warn("Sin conexión, usando datos locales:", err);
+    console.warn("JSONBin no disponible, usando local:", err.message);
   }
 }
 
