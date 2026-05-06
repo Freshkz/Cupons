@@ -39,6 +39,12 @@ const CONFIG_EMAIL = {
   TEMPLATE_ID:  "template_3i29qmi",
 };
 
+const CONFIG_SYNC = {
+  BIN_ID:  "69fad65d856a682189b079e6",
+  API_KEY: "$2a$10$rjQmMhPuWojkLBK3IRhTIe3q.PjkoNDlELyd8oBP3o7M8I.KQmjgq",
+  URL:     () => `https://api.jsonbin.io/v3/b/${CONFIG_SYNC.BIN_ID}`,
+};
+
 /* ────────────────────────────────────────────────
    TEMPORIZADOR — fecha de reinicio
    Cambiá el día aquí (actualmente: día 22 de cada mes)
@@ -592,7 +598,40 @@ function idCupon(v) {
   return `${v.tipo}__${v.titulo}`;
 }
 
-const canjeados    = JSON.parse(localStorage.getItem("cupones_canjeados_v3") || "{}");
+let canjeados = JSON.parse(localStorage.getItem("cupones_canjeados_v3") || "{}");
+
+async function cargarCanjeados() {
+  try {
+    const res = await fetch(CONFIG_SYNC.URL() + "/latest", {
+      headers: { "X-Master-Key": CONFIG_SYNC.API_KEY }
+    });
+    const data = await res.json();
+    const remoto = data.record || {};
+    // Mergear local + remoto (el remoto gana)
+    Object.assign(canjeados, remoto);
+    localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
+    renderGrilla();
+  } catch (err) {
+    console.warn("Sin conexión, usando datos locales:", err);
+  }
+}
+
+async function guardarCanjeados() {
+  try {
+    localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
+    await fetch(CONFIG_SYNC.URL(), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": CONFIG_SYNC.API_KEY
+      },
+      body: JSON.stringify(canjeados)
+    });
+  } catch (err) {
+    console.warn("Error al guardar en la nube:", err);
+  }
+}
+
 let filtroActual   = "todos";
 let cuponEnCanje   = null;
 let modoGamer      = false;
@@ -1560,7 +1599,7 @@ btnConfirmar.addEventListener("click", async () => {
   const v   = todos[idx];
 
   canjeados[idCupon(v)] = { fecha: new Date().toLocaleString("es-AR") };
-  localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
+  await guardarCanjeados();
 
   overlay.classList.remove("visible");
   cuponEnCanje = null;
@@ -1848,7 +1887,7 @@ function lanzarParticulasSecretas() {
 
 
 /* ══════════════════════════════════════════════
-   CONFETTI
+  CONFETTI
    ══════════════════════════════════════════════ */
 function lanzarConfetti(gamer) {
   const colores = gamer
@@ -1992,6 +2031,7 @@ crearFraseFondo();
    ══════════════════════════════════════════════ */
 renderGrilla();
 iniciarPersonajes();
+cargarCanjeados();
 /* ══════════════════════════════════════════════
    CONTADOR DÍAS JUNTOS
    ══════════════════════════════════════════════ */
