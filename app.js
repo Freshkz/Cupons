@@ -1598,8 +1598,9 @@ btnConfirmar.addEventListener("click", async () => {
   const idx = cuponEnCanje;
   const v   = todos[idx];
 
+  // 1. Actualizar UI inmediatamente
   canjeados[idCupon(v)] = { fecha: new Date().toLocaleString("es-AR") };
-  await guardarCanjeados();
+  localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
 
   overlay.classList.remove("visible");
   cuponEnCanje = null;
@@ -1610,7 +1611,7 @@ btnConfirmar.addEventListener("click", async () => {
   audioCheck.play().catch(() => {});
   if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
   lanzarConfetti(modoGamer);
-  mostrarToast("Cupón canjeado! ♥ Enviando aviso...");
+  mostrarToast("Cupón canjeado! ♥");
 
   // Animar tachado
   setTimeout(() => {
@@ -1630,18 +1631,17 @@ btnConfirmar.addEventListener("click", async () => {
     });
   }, 50);
 
-  try {
-    await emailjs.send(CONFIG_EMAIL.SERVICE_ID, CONFIG_EMAIL.TEMPLATE_ID, {
-      cupon_emoji: (v.emoji.includes("/") ? (v.emojiBackup || "🎁") : v.emoji),
-      cupon_titulo: v.titulo,
-      cupon_tipo:   v.tipo === "sexy" ? "🔥 Cupón Sexy" : v.tipo === "gamer" ? "🎮 Cupón Gamer" : v.tipo === "cotidiano" ? "☀️ Cupón Cotidiano" : "💌 Cupón Romántico",
-      fecha:        new Date().toLocaleString("es-AR"),
-    });
-    mostrarToast("Aviso enviado! Ya sé lo que querés ♥");
-  } catch (err) {
-    console.error("EmailJS error:", err);
-    mostrarToast("Cupón canjeado! (revisá la config de EmailJS)");
-  }
+  // 2. JSONBin en segundo plano
+  guardarCanjeados().catch(err => console.warn("JSONBin error:", err));
+
+  // 3. EmailJS en segundo plano
+  emailjs.send(CONFIG_EMAIL.SERVICE_ID, CONFIG_EMAIL.TEMPLATE_ID, {
+    cupon_emoji:  (v.emoji.includes("/") ? (v.emojiBackup || "🎁") : v.emoji),
+    cupon_titulo: v.titulo,
+    cupon_tipo:   v.tipo === "sexy" ? "🔥 Cupón Sexy" : v.tipo === "gamer" ? "🎮 Cupón Gamer" : v.tipo === "cotidiano" ? "☀️ Cupón Cotidiano" : "💌 Cupón Romántico",
+    fecha:        new Date().toLocaleString("es-AR"),
+  }).then(() => mostrarToast("Aviso enviado! ♥"))
+    .catch(err => console.error("EmailJS:", err));
 });
 
 
