@@ -325,6 +325,31 @@ te pienso y se me acomoda el mundo, a la inversa tambien jjeje.`,
 
 `,
   },
+  alguntipo: {
+    titulo: "⋆༺💗༻⋆ 𝟐𝟗   ⋆༺💗༻⋆",
+          texto: `
+      Hay personas que llegan…
+      y otras que se sienten destinadas. ✨
+      De todas las personas del mundo…
+      terminamos siendo nosotros dos.
+      tan natural,
+      que nunca imaginé
+      que terminarías convirtiéndote
+      en mi lugar favorito del mundo. 🌎💗
+      El 29 no es solo una fecha.
+      Es acordarme de tus risas,
+      de nuestras conversaciones eternas,
+      de las noches donde el sueño perdía
+      porque hablar con vos era más lindo. ☁️. ✨.
+`,
+
+  },
+  error404: {
+    titulo: "ERROR 404 — Feelings Not Found",
+    texto: `The message you are looking for may have been removed, renamed…
+            or Fresh is currently too busy thinking about Kin 💗
+`,
+  },
 };
 
 /* ────────────────────────────────────────────────
@@ -339,11 +364,14 @@ const CONTRASENAS_SECRETAS = {
   "kin":                            "Kin",
   "negros":                         "Negros",
   "jinu":                           "jinu",
+  "error 404":                            "error404",
+  "29":                            "alguntipo",
   "modo gamer":                     "gamer",        // especial: activa modo gamer
   "reset cupones":                  "reset",        // especial: resetea todos los canjeados
   "modo tota":                           "sexy-toggle",  // especial: muestra/oculta cupones sexy
   "modo totita":                         "sexy-toggle",  // especial: igual que tota
   "amor":                           "reset-modo",
+  "dev mode":                       "dev-toggle",
 };
 
 /* ────────────────────────────────────────────────
@@ -424,6 +452,14 @@ const CONVERSACIONES = [
     { quien: "Kin", texto: "y es bastante obvio cual seria 😏", delay: 15000 },
   ],
 
+  [
+  { quien: "Fresh", texto: "amor estas despierta?", delay: 800 },
+  { quien: "Kin", texto: "si amorcito pequeño, no podia dormir 😭", delay: 1900 },
+  { quien: "Fresh", texto: "venia a robarte besos virtuales entonces", delay: 3400 },
+  { quien: "Kin", texto: "llegaste tarde, ya me los robe yo primero 💋", delay: 5200 },
+  { quien: "Fresh", texto: "imposible ganarte", delay: 6800 },
+  { quien: "Kin", texto: "obvio, soy un pedazo de nazi", delay: 8600 },
+  ],
 
   [
     { quien: "Fresh", texto: "Te das cuenta que tu nombre aparece en todos lados?", delay: 1200 },
@@ -436,6 +472,16 @@ const CONVERSACIONES = [
   ],
 
 
+  [
+  { quien: "Fresh", texto: "me salio una partida horrible 😭", delay: 1200 },
+  { quien: "Kin", texto: "cuantas veces moriste?", delay: 2600 },
+  { quien: "Fresh", texto: "no quiero hablar del tema", delay: 4300 },
+  { quien: "Kin", texto: "JAJAJA entonces fueron muchas", delay: 6100 },
+  { quien: "Fresh", texto: "pero mira el lado bueno", delay: 7900 },
+  { quien: "Kin", texto: "cual?", delay: 9200 },
+  { quien: "Fresh", imagen: "img/broly_culo.png", delay: 10800 },
+  ],
+
 
   [
     { quien: "Fresh", texto: "Amoor si rompemos todo… se puede resetear?", delay: 800 },
@@ -445,6 +491,25 @@ const CONVERSACIONES = [
   ],
 
 
+  [
+  { quien: "Fresh", texto: "te imaginas vivir juntos?", delay: 900 },
+  { quien: "Kin", texto: "si, vos jugando y yo molestandote cada 5 minutos", delay: 2400 },
+  { quien: "Fresh", texto: "eso ya pasa ahora", delay: 4100 },
+  { quien: "Kin", texto: "pero ahi podria darte besitos mientras pierdes rankeds", delay: 6200 },
+  { quien: "Fresh", texto: "entonces pisaria diamante facil", delay: 8400 },
+  { quien: "Kin", texto: "soy tu buff emocional 💗", delay: 10100 },
+  ],
+
+
+  [
+  { quien: "Fresh", texto: "estas demasiado linda hoy", delay: 1000 },
+  { quien: "Kin", texto: "hoy solamente? 🤨", delay: 2500 },
+  { quien: "Fresh", texto: "uh ya empezo la auditoria", delay: 4300 },
+  { quien: "Kin", texto: "responda correctamente señor", delay: 6200 },
+  { quien: "Fresh", texto: "siempre estas linda, hoy solo estoy mas enamorado", delay: 8700 },
+  { quien: "Kin", texto: "aaaaa asi si 😭💗", delay: 10400 },
+  ],
+  
   [
     { quien: "Fresh", texto: "amor…", delay: 800 },
     { quien: "Kin", texto: "decime 💕", delay: 2000 },
@@ -658,6 +723,12 @@ let chatAbierto    = false;
 let clicksCorazon  = 0;
 let timerCorazon   = null;
 
+
+let secretosDescubiertos = JSON.parse(localStorage.getItem("secretos_descubiertos") || "[]");
+
+
+let mododev = false;
+
 let audioActual = null;
 
 
@@ -710,6 +781,23 @@ function reproducirAudio(audioTarget) {
   audioTarget.play().catch(() => {});
 }
 
+
+function registrarSecreto(val) {
+  if (!secretosDescubiertos.includes(val)) {
+    secretosDescubiertos.push(val);
+    localStorage.setItem("secretos_descubiertos", JSON.stringify(secretosDescubiertos));
+  }
+  actualizarContadorSecretos();
+}
+
+function actualizarContadorSecretos() {
+  const el = document.getElementById("contador-secretos");
+  if (!el) return;
+  const total = Object.keys(CONTRASENAS_SECRETAS).length + PERSONAJES.length;
+  const encontrados = secretosDescubiertos.length;
+  el.textContent = `🔍 ${encontrados}/${total} secretos descubiertos`;
+  el.style.opacity = encontrados > 0 ? "1" : "0.4";
+}
 
 
 // Sonido de click para el corazón (generado por Web Audio API, sin archivo externo)
@@ -1478,7 +1566,7 @@ function renderGrilla() {
     const idx    = todos.indexOf(v);
     const esSexy  = v.tipo === "sexy";
     const esGamer = v.tipo === "gamer";
-    const esCanj  = !!canjeados[idCupon(v)];
+    const esCanj = mododev ? false : !!canjeados[idCupon(v)];
     const efecto = v.efecto || getEfectoFallback(fi);
 
     const esCotidiano = v.tipo === "cotidiano";
@@ -1612,12 +1700,19 @@ btnConfirmar.addEventListener("click", async () => {
   const idx = cuponEnCanje;
   const v   = todos[idx];
 
+  overlay.classList.remove("visible");
+  cuponEnCanje = null;
+
+  // Modo dev: simular sin guardar nada
+  if (mododev) {
+    mostrarToast("🛠️ Dev: canje simulado, nada guardado");
+    return;
+  }
+
   // 1. Actualizar UI inmediatamente
   canjeados[idCupon(v)] = { fecha: new Date().toLocaleString("es-AR") };
   localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
 
-  overlay.classList.remove("visible");
-  cuponEnCanje = null;
   renderGrilla();
 
   audioCheck.currentTime = 0;
@@ -1824,9 +1919,11 @@ campoSecreto.addEventListener("keydown", e => {
   clicksCorazon = 0;
 
   const accion = CONTRASENAS_SECRETAS[val];
+
   if (accion === "gamer") {
     activarModoGamer();
-  
+    registrarSecreto(val);
+
   } else if (accion === "reset-modo") {
     if (modoGamer || modoSexy) {
       if (modoGamer) activarModoGamer();
@@ -1835,8 +1932,12 @@ campoSecreto.addEventListener("keydown", e => {
     } else {
       mostrarToast("💕 Ya estás en la página amor, mi amada 💕");
     }
+    registrarSecreto(val);
+
   } else if (accion === "sexy-toggle") {
     activarModoSexy();
+    registrarSecreto(val);
+
   } else if (accion === "reset") {
     if (confirm("¿Resetear todos los cupones canjeados? Vuelven a estar disponibles. ♥")) {
       Object.keys(canjeados).forEach(k => delete canjeados[k]);
@@ -1844,11 +1945,22 @@ campoSecreto.addEventListener("keydown", e => {
       renderGrilla();
       mostrarToast("✨ Todos los cupones reseteados!");
     }
-  } 
-  else if (PERSONAJES.find(p => p.contrasena === val)) {
-  abrirPersonaje(PERSONAJES.find(p => p.contrasena === val).id);
-} else if (accion) {
-  mostrarModalSecreto(accion);
+
+  } else if (accion === "dev-toggle") {
+    mododev = !mododev;
+    mostrarToast(mododev ? "🛠️ Modo dev ON" : "🛠️ Modo dev OFF");
+    renderGrilla();
+
+  } else if (PERSONAJES.find(p => p.contrasena === val)) {
+    const personaje = PERSONAJES.find(p => p.contrasena === val);
+    abrirPersonaje(personaje.id);
+    registrarSecreto(val);
+
+  } else if (accion) {
+    // papoy, wife, kin, negros, jinu, 29, y cualquier otro mensaje secreto
+    mostrarModalSecreto(accion);
+    registrarSecreto(val);
+
   } else {
     const pista = buscarPistaTroll(val);
     mostrarToast(pista);
@@ -2046,6 +2158,7 @@ crearFraseFondo();
 renderGrilla();
 iniciarPersonajes();
 cargarCanjeados();
+actualizarContadorSecretos(); // ← agregar
 /* ══════════════════════════════════════════════
    CONTADOR DÍAS JUNTOS
    ══════════════════════════════════════════════ */

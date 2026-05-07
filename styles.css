@@ -1979,3 +1979,15 @@ article.buu-card:hover .buu-mensaje { opacity: 1; }
   display: block;
   margin: 4px 0;
 }
+
+
+.contador-secretos {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  letter-spacing: 0.05em;
+  transition: color 0.5s, opacity 0.5s;
+}
+body.gamer-mode .contador-secretos { color: rgba(0,255,204,0.6); }
+body.sexy-mode  .contador-secretos { color: rgba(255,128,170,0.6); }
