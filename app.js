@@ -310,7 +310,7 @@ Te amo con cada parte rara y desorganizada de mí.`,
 
 Si esto lo estás leyendo, es porque sos exactamente la persona para quien lo escribí.
 
-Eres mi primera generación. Mi única generación. La persona con la que quiero todas las aventuras — las del juego y las de verdad.
+Sos mi primera generación. Mi única generación. La persona con la que quiero todas las aventuras — las del juego y las de verdad.
 
 No hay panel de lookism que te describa. Sos el unlock más importante de mi vida.`,
   },
@@ -538,7 +538,7 @@ const CONVERSACIONES = [
   { quien: "Fresh", texto: "te imaginas vivir juntos?", delay: 900 },
   { quien: "Kin", texto: "si, vos jugando y yo molestandote cada 5 minutos", delay: 2400 },
   { quien: "Fresh", texto: "eso ya pasa ahora", delay: 4100 },
-  { quien: "Kin", texto: "pero ahi podria darte besitos mientras pierdes rankeds", delay: 6200 },
+  { quien: "Kin", texto: "pero ahi podria darte besitos mientras perdes rankeds", delay: 6200 },
   { quien: "Fresh", texto: "entonces pisaria diamante facil", delay: 8400 },
   { quien: "Kin", texto: "soy tu buff emocional 💗", delay: 10100 },
   ],
@@ -825,7 +825,11 @@ function reproducirAudio(audioTarget) {
 }
 
 
+// Claves que NO se cuentan como secretos (solo para el dev)
+const CLAVES_EXCLUIDAS = ["dev mode", "reset cupones", "amor"];
+
 function registrarSecreto(val) {
+  if (CLAVES_EXCLUIDAS.includes(val)) return; // ← no registrar
   if (!secretosDescubiertos.includes(val)) {
     secretosDescubiertos.push(val);
     localStorage.setItem("secretos_descubiertos", JSON.stringify(secretosDescubiertos));
@@ -836,7 +840,7 @@ function registrarSecreto(val) {
 function actualizarContadorSecretos() {
   const el = document.getElementById("contador-secretos");
   if (!el) return;
-  const total = Object.keys(CONTRASENAS_SECRETAS).length + PERSONAJES.length;
+  const total = Object.keys(CONTRASENAS_SECRETAS).filter(k => !CLAVES_EXCLUIDAS.includes(k)).length + PERSONAJES.length;
   const encontrados = secretosDescubiertos.length;
   el.textContent = `🔍 ${encontrados}/${total} secretos descubiertos`;
   el.style.opacity = encontrados > 0 ? "1" : "0.4";
@@ -1847,7 +1851,6 @@ const RESPUESTAS_MALAS = [
    PISTAS TROLL
    ══════════════════════════════════════════════ */
 function buscarPistaTroll(intento) {
-  //Detectar palabras malsonantes primero
   const esMala = PALABRAS_MALAS.some(p => intento.includes(p));
   if (esMala) {
     const audiobruh = document.getElementById("audio-bruh");
@@ -1857,32 +1860,19 @@ function buscarPistaTroll(intento) {
     return RESPUESTAS_MALAS[Math.floor(Math.random() * RESPUESTAS_MALAS.length)];
   }
 
-  // ... resto de la función igual
-  const claves = Object.keys(CONTRASENAS_SECRETAS);
+  // Incluir TODAS las claves: contraseñas secretas + contraseñas de personajes
+  const claves = [
+    ...Object.keys(CONTRASENAS_SECRETAS),
+    ...PERSONAJES.map(p => p.contrasena),
+  ];
 
-  // Ver si alguna clave contiene lo que escribió o viceversa
-  const cercana = claves.find(clave =>
-    clave.includes(intento) ||
-    intento.includes(clave.split(" ")[0]) // primera palabra de la clave
-  );
-
-  if (cercana) {
-    const pistasCaliente = [
-      "👀 estuviste MUY cerca...",
-      "🔥 casi casi...",
-      "😏 seguí pensando, ibas bien",
-      "🫦 eso me suena familiar...",
-      "💋 caliente caliente...",
-    ];
-    return pistasCaliente[Math.floor(Math.random() * pistasCaliente.length)];
-  }
-
-  // Levenshtein simple — detecta si se equivocó por poco en una palabra
-  const casiFallo = claves.find(clave => distancia(intento, clave) <= 2);
-  if (casiFallo) {
-    return "🤏 OMG CASI BEBA, revisá cómo lo escribiste";
-  }
-
+  const pistasCaliente = [
+    "👀 estuviste MUY cerca...",
+    "🔥 casi casi...",
+    "😏 seguí pensando, ibas bien",
+    "🫦 eso me suena familiar...",
+    "💋 caliente caliente...",
+  ];
   const pistasLejos = [
     "Mmm... no es eso 🤭",
     "❌ ni cerca jaja",
@@ -1891,10 +1881,31 @@ function buscarPistaTroll(intento) {
     "😂 seguí intentando",
     "🤔 pensá más...",
   ];
+
+  const cercana = claves.find(clave => {
+    if (intento.length < 2) return false;
+    if (clave.length <= 4) {
+      return clave.startsWith(intento) && intento.length >= clave.length - 1;
+    }
+    return intento.length >= 3 && clave.includes(intento);
+  });
+
+  if (cercana) {
+    return pistasCaliente[Math.floor(Math.random() * pistasCaliente.length)];
+  }
+
+  const casiFallo = claves.find(clave => {
+    if (Math.abs(clave.length - intento.length) > 3) return false;
+    if (intento.length < 3) return false;
+    return distancia(intento, clave) <= 2;
+  });
+
+  if (casiFallo) {
+    return "🤏 OMG CASI BEBA, revisá cómo lo escribiste";
+  }
+
   return pistasLejos[Math.floor(Math.random() * pistasLejos.length)];
 }
-
-
 
 
 
@@ -2559,6 +2570,14 @@ crearFraseFondo();
     setTimeout(() => el.classList.add("cargado"), 500);
   });
 
+
+
+// Fix: cerrar Goku siempre funciona, incluso si ya fue cerrado antes
+document.getElementById("goku-cerrar").addEventListener("click", () => {
+  document.getElementById("goku-tutorial").classList.remove("visible");
+  localStorage.setItem("goku_tutorial_cerrado", "1");
+});
+
 /* ══════════════════════════════════════════════
    INICIO
    ══════════════════════════════════════════════ */
@@ -2671,3 +2690,66 @@ function actualizar() {
     setTimeout(() => overlay.classList.add("oculto"), 800);
   });
 })();
+
+
+/* ══════════════════════════════════════════════
+   GOKU TUTORIAL
+   ══════════════════════════════════════════════ */
+const TIPS_TUTORIAL = [
+  "¡Hacé click en el ♥ para descubrir secretos! 💕",
+  "Hay contraseñas secretas escondidas... ¿las encontrás? 🔍",
+  "Algunos cupones tienen efectos especiales al hacer hover ✨",
+  "¿Ya probaste activar el modo gamer? 🎮",
+  "", // ← este se llena dinámicamente con el total de secretos
+  "Hacé click en mí para ocultarme 😄",
+];
+
+function iniciarGokuTutorial() {
+  if (modoGamer || modoSexy) return;
+
+  const cerrado = localStorage.getItem("goku_tutorial_cerrado");
+  const hoy = new Date().toDateString();
+  if (cerrado === hoy) return;
+
+  // Calcular total de secretos dinámicamente
+  const totalSecretos = Object.keys(CONTRASENAS_SECRETAS).length + PERSONAJES.length;
+  TIPS_TUTORIAL[4] = `Hay más de ${totalSecretos} secretos esperándote... 💜`;
+
+  const tutorial = document.getElementById("goku-tutorial");
+  const textoEl  = document.getElementById("goku-texto");
+  const btnSig   = document.getElementById("goku-siguiente");
+
+  // Empezar por un tip aleatorio
+  let tipActual = Math.floor(Math.random() * TIPS_TUTORIAL.length);
+  tutorial.classList.add("visible");
+  textoEl.textContent = TIPS_TUTORIAL[tipActual];
+
+  btnSig.addEventListener("click", () => {
+    tipActual = (tipActual + 1) % TIPS_TUTORIAL.length;
+    textoEl.style.opacity = "0";
+    textoEl.style.transform = "translateY(6px)";
+    setTimeout(() => {
+      textoEl.textContent = TIPS_TUTORIAL[tipActual];
+      textoEl.style.transition = "opacity 0.3s, transform 0.3s";
+      textoEl.style.opacity = "1";
+      textoEl.style.transform = "translateY(0)";
+      btnSig.textContent = tipActual === TIPS_TUTORIAL.length - 1
+        ? "Volver al inicio →"
+        : "Siguiente →";
+    }, 150);
+  });
+}
+
+document.getElementById("goku-cerrar").addEventListener("click", () => {
+  document.getElementById("goku-tutorial").classList.remove("visible");
+  localStorage.setItem("goku_tutorial_cerrado", new Date().toDateString());
+});
+
+document.getElementById("goku-img").addEventListener("click", () => {
+  document.getElementById("goku-tutorial").classList.remove("visible");
+  localStorage.setItem("goku_tutorial_cerrado", new Date().toDateString());
+});
+
+window.addEventListener("load", () => {
+  setTimeout(() => iniciarGokuTutorial(), 1000);
+});

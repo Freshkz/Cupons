@@ -2178,3 +2178,147 @@ body.sexy-mode .vale:hover::after {
 .vale:hover .vale-emoji {
   animation: sorpresaReveal 0.35s ease forwards;
 }
+
+
+
+
+
+/* ── GOKU TUTORIAL ── */
+.goku-tutorial {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 0;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  transform: translateY(110%);   /* ← oculto abajo */
+  transition: transform 0.6s cubic-bezier(.175,.885,.32,1.275);
+}
+.goku-tutorial.visible {
+  transform: translateY(0);      /* ← visible */
+  pointer-events: all;
+}
+
+/* ← la animación de flotar solo en el img, no en el contenedor */
+.goku-img {
+  width: 120px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+  animation: gokuFlotando 3s ease-in-out infinite;
+  cursor: pointer;
+}
+@keyframes gokuFlotando {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+.goku-globo {
+  position: relative;
+  background: #fff;
+  border: 2px solid var(--rosa);
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  max-width: 220px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 20px rgba(194,110,138,0.2);
+  animation: gokuGloboEntrada 0.4s ease forwards;
+}
+@keyframes gokuGloboEntrada {
+  from { opacity: 0; transform: scale(0.85) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* Triangulito del globo apuntando a Goku */
+.goku-globo::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-top-color: var(--rosa);
+}
+.goku-globo::before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 9px solid transparent;
+  border-top-color: #fff;
+  z-index: 1;
+}
+
+#goku-texto {
+  font-size: 0.82rem;
+  color: var(--texto);
+  line-height: 1.5;
+  margin: 0 0 0.6rem;
+  font-family: 'Lato', sans-serif;
+  transition: opacity 0.3s, transform 0.3s;
+  background: linear-gradient(90deg, var(--rosa-oscuro), var(--dorado), var(--rosa-oscuro));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gokuTextoShimmer 3s linear infinite;
+}
+
+@keyframes gokuTextoShimmer {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+body.gamer-mode #goku-texto {
+  background: linear-gradient(90deg, var(--gamer-accent), var(--gamer-pink), var(--gamer-accent));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gokuTextoShimmer 2s linear infinite;
+}
+
+.goku-siguiente {
+  background: var(--rosa-oscuro);
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  transition: background 0.2s;
+  letter-spacing: 0.05em;
+}
+.goku-siguiente:hover { background: #a85b78; }
+
+.goku-cerrar {
+  position: absolute;
+  top: 6px; right: 8px;
+  background: none;
+  border: none;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.goku-cerrar:hover { color: var(--rosa-oscuro); }
+
+/* Modo gamer */
+body.gamer-mode .goku-globo {
+  background: #0d0d2b;
+  border-color: var(--gamer-accent);
+  color: var(--gamer-accent);
+}
+body.gamer-mode .goku-globo::after  { border-top-color: var(--gamer-accent); }
+body.gamer-mode .goku-globo::before { border-top-color: #0d0d2b; }
+body.gamer-mode #goku-texto { color: var(--gamer-accent); }
+
+.goku-tutorial.visible .goku-globo,
+.goku-tutorial.visible .goku-cerrar,
+.goku-tutorial.visible .goku-siguiente,
+.goku-tutorial.visible .goku-img {
+  pointer-events: all;
+}
