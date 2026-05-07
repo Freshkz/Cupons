@@ -2696,12 +2696,16 @@ function actualizar() {
    GOKU TUTORIAL
    ══════════════════════════════════════════════ */
 const TIPS_TUTORIAL = [
+  "Hola!! Soy Goku 😄",
+  "Tu maridito me contrató para explicarte la página porque él seguramente estaba distraído pensando en vos 💀",
+  "Yo voy a ayudarte a entender esta página antes de que toques algo raro.... 😭",
   "¡Hacé click en el ♥ para descubrir secretos! 💕",
   "Hay contraseñas secretas escondidas... ¿las encontrás? 🔍",
-  "Algunos cupones tienen efectos especiales al hacer hover ✨",
-  "¿Ya probaste activar el modo gamer? 🎮",
-  "", // ← este se llena dinámicamente con el total de secretos
-  "Hacé click en mí para ocultarme 😄",
+  "Algunos cupones tienen efectos especiales al pasar el mouse por encima ✨",
+  "¿Ya probaste activar algun modo? 🎮",
+  "", // ← índice 7, se llena dinámicamente
+  "Si cerrás esta ventana voy a desaparecer por 24 horas completas 😭",
+  "Hacé click en mí para ocultarme POR 24 HORAS KIN PORFAVOR NO😄",
 ];
 
 function iniciarGokuTutorial() {
@@ -2711,32 +2715,48 @@ function iniciarGokuTutorial() {
   const hoy = new Date().toDateString();
   if (cerrado === hoy) return;
 
-  // Calcular total de secretos dinámicamente
-  const totalSecretos = Object.keys(CONTRASENAS_SECRETAS).length + PERSONAJES.length;
-  TIPS_TUTORIAL[4] = `Hay más de ${totalSecretos} secretos esperándote... 💜`;
+  // ← índice 7, no 4
+  const totalSecretos = Object.keys(CONTRASENAS_SECRETAS).filter(k => !CLAVES_EXCLUIDAS.includes(k)).length + PERSONAJES.length;
+  TIPS_TUTORIAL[7] = `Hay más de ${totalSecretos} secretos esperándote... 💜`;
 
   const tutorial = document.getElementById("goku-tutorial");
   const textoEl  = document.getElementById("goku-texto");
   const btnSig   = document.getElementById("goku-siguiente");
 
-  // Empezar por un tip aleatorio
-  let tipActual = Math.floor(Math.random() * TIPS_TUTORIAL.length);
+  const esLaPrimeraVez = !localStorage.getItem("goku_visto_antes");
+  let tipActual = esLaPrimeraVez ? 0 : Math.floor(Math.random() * TIPS_TUTORIAL.length);
+  if (esLaPrimeraVez) localStorage.setItem("goku_visto_antes", "1");
+
   tutorial.classList.add("visible");
-  textoEl.textContent = TIPS_TUTORIAL[tipActual];
+
+  let escribiendoTimer = null;
+  function escribir(texto) {
+    textoEl.textContent = "";
+    textoEl.style.opacity = "1";
+    textoEl.style.transform = "translateY(0)";
+    let i = 0;
+    clearInterval(escribiendoTimer);
+    escribiendoTimer = setInterval(() => {
+      textoEl.textContent += texto[i];
+      i++;
+      if (i >= texto.length) clearInterval(escribiendoTimer);
+    }, 35);
+  }
+
+  escribir(TIPS_TUTORIAL[tipActual]);
 
   btnSig.addEventListener("click", () => {
     tipActual = (tipActual + 1) % TIPS_TUTORIAL.length;
     textoEl.style.opacity = "0";
     textoEl.style.transform = "translateY(6px)";
+    textoEl.style.transition = "opacity 0.2s, transform 0.2s";
     setTimeout(() => {
-      textoEl.textContent = TIPS_TUTORIAL[tipActual];
-      textoEl.style.transition = "opacity 0.3s, transform 0.3s";
-      textoEl.style.opacity = "1";
-      textoEl.style.transform = "translateY(0)";
+      textoEl.style.transition = "";
+      escribir(TIPS_TUTORIAL[tipActual]);
       btnSig.textContent = tipActual === TIPS_TUTORIAL.length - 1
         ? "Volver al inicio →"
         : "Siguiente →";
-    }, 150);
+    }, 200);
   });
 }
 
@@ -2750,6 +2770,7 @@ document.getElementById("goku-img").addEventListener("click", () => {
   localStorage.setItem("goku_tutorial_cerrado", new Date().toDateString());
 });
 
-window.addEventListener("load", () => {
-  setTimeout(() => iniciarGokuTutorial(), 1000);
+// ← reemplazar window.addEventListener("load") por esto
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => iniciarGokuTutorial(), 2000);
 });
