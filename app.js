@@ -2730,7 +2730,7 @@ const TIPS_TUTORIAL = [
   "¿Ya probaste activar algun modo? 🎮",
   "", // ← índice 7, se llena dinámicamente
   "Si cerrás esta ventana voy a desaparecer por 24 horas completas 😭",
-  "ₛᵢ ₑₛᶜᵣᵢᵦₑₛ ₜᵤₜₒᵣᵢₐₗ ₚᵤₑᴰₒ ₗₗₑᴳₐᵣ ₐ ᵥₒₗᵥₑᵣ",
+  "Si escribes TUTORIAL en el campo secreto, puedo llegar a volver......!",
   "Hacé click en mí para ocultarme POR 24 HORAS KIN PORFAVOR NO😄",
 ];
 
