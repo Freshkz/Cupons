@@ -116,7 +116,39 @@ const PERSONAJES = [
     texto:       "TE AMO TE TE AMO TE AMO TE AMO TE AMO TE AMO",
     confetti:    true,
   },
+
+  {
+  id:             "invencible",
+  contrasena:     "invencible",
+  fondo:          "",
+  personaje:      "",
+  titulo:         "",
+  texto:          "",
+  confetti:       false,
+  audio:          null,
+  introVideo:     "videos/Invincible_titlecard.mp4",
+  introMuted:     false,
+  introTriggerEn: "invencibl",
+  soloVideo:      true,   // ← solo el video, sin modal después
+  },
+
   // Para agregar uno nuevo, copiá el bloque de arriba y cambiá los valores
+
+
+
+
+   // id:          "invencible",
+  // contrasena:  "invencible",
+  // fondo:       "",
+  // personaje:   "",
+  // titulo:      "",
+  // texto:       "",
+  // confetti:    false,
+  // audio:       "",  // tema de la serie
+  // introVideo:  "videos/Invincible_titlecard.mp4",  // cambiá por el ID real
+  // introMuted:  false,                            // false = con sonido
+  // introTriggerEn: "invencibl",   // ← el video arranca cuando escriben esto
+  // },
 ];
 
 
@@ -823,6 +855,31 @@ const corazonEl      = document.getElementById("corazon-secreto");
 const campoSecretoWrap = document.getElementById("campo-secreto-wrap");
 const campoSecreto   = document.getElementById("campo-secreto");
 
+let introActiva = false;  // flag para no re-triggerear
+
+campoSecreto.addEventListener("input", () => {
+  if (introActiva) return;
+  const val = campoSecreto.value.toLowerCase();
+
+  const personaje = PERSONAJES.find(p =>
+    p.introTriggerEn && val === p.introTriggerEn
+  );
+  if (!personaje) return;
+
+  introActiva = true;
+  mostrarIntroYoutube(personaje, () => {
+    introActiva = false;
+  });
+});
+
+// Resetear flag si borran el campo
+campoSecreto.addEventListener("input", () => {
+  if (campoSecreto.value === "") introActiva = false;
+});
+
+
+
+
 audio.volume      = 0.15;
 audioGamer.volume = 0.15;
 audioSexy.volume = 0.15;
@@ -937,6 +994,39 @@ function iniciarEfectoBerenjenas() {
         }, i * 100);
       }
     });
+  });
+}
+
+
+
+function actualizarPuntosNuevos() {
+  const vistos = JSON.parse(localStorage.getItem("cupones_vistos") || "[]");
+
+  const filtros = {
+    "romantico":  "[data-filtro='normales']",
+    "cotidiano":  "[data-filtro='cotidianos']",
+    "sexy":       "[data-filtro='sexy']",
+    "gamer":      "[data-filtro='gamer']",
+  };
+
+  Object.entries(filtros).forEach(([tipo, selector]) => {
+    const tabEl = document.querySelector(selector);
+    if (!tabEl) return;
+
+    const puntoExistente = tabEl.querySelector(".tab-punto-nuevo");
+    if (puntoExistente) puntoExistente.remove();
+
+    // Hay cupón nuevo si existe un cupón de ese tipo que no fue visto
+    const hayNuevo = todos.some(v =>
+      v.tipo === tipo && !vistos.includes(idCupon(v))
+    );
+
+    const tabVisible = tabEl.style.display !== "none";
+    if (hayNuevo && tabVisible) {
+      const punto = document.createElement("span");
+      punto.className = "tab-punto-nuevo";
+      tabEl.appendChild(punto);
+    }
   });
 }
 
@@ -1412,41 +1502,310 @@ function iniciarPersonajes() {
   const container = document.getElementById("personajes-container");
 
   PERSONAJES.forEach(p => {
-    // Crear modal
-    const overlay = document.createElement("div");
-    overlay.className = "overlay-buu";
-    overlay.id = `overlay-${p.id}`;
-    overlay.innerHTML = `
-      <article class="buu-card">
-        <img src="${p.fondo}" alt="fondo" class="buu-fondo">
-        <img src="${p.personaje}" alt="${p.id}" class="buu-personaje">
-        <div class="buu-mensaje">
-          <div class="buu-titulo">${p.titulo}</div>
-          <div class="buu-texto">${p.texto}</div>
-        </div>
-      </article>
-      <button class="buu-cerrar" id="${p.id}-cerrar">✕ Cerrar</button>
-    `;
-    container.appendChild(overlay);
 
-    // Listeners de cierre
-    document.getElementById(`${p.id}-cerrar`).addEventListener("click", () => {
-      overlay.classList.remove("visible");
-    });
-    overlay.addEventListener("click", e => {
-      if (e.target === overlay) overlay.classList.remove("visible");
-    });
+    // ── Intro de video — solo para personajes CON modal después ──
+    if (p.introVideo && !p.soloVideo) {
+      const introOverlay = document.createElement("div");
+      introOverlay.id = `intro-${p.id}`;
+      introOverlay.style.cssText = `
+        position: fixed; inset: 0; background: #000;
+        z-index: 400; display: flex; align-items: center;
+        justify-content: center; opacity: 0; pointer-events: none;
+        transition: opacity 0.4s;
+      `;
+      introOverlay.innerHTML = `
+        <video id="intro-vid-${p.id}" src="${p.introVideo}"
+          style="max-width:100%;max-height:100%;object-fit:contain;"
+          playsinline ${p.introMuted ? "muted" : ""}>
+        </video>
+        <button style="
+          position:absolute; top:1rem; right:1rem;
+          background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
+          color:#fff; border-radius:20px; padding:0.4rem 1rem;
+          font-size:0.8rem; cursor:pointer; font-family:'Lato',sans-serif;
+        " id="intro-skip-${p.id}">✕ Cerrar</button>
+      `;
+      container.appendChild(introOverlay);
+
+      const abrirModalDespues = () => {
+        const vid = document.getElementById(`intro-vid-${p.id}`);
+        vid.pause();
+        introOverlay.style.opacity = "0";
+        introOverlay.style.pointerEvents = "none";
+        abrirModalPersonaje(p);
+      };
+
+      document.getElementById(`intro-skip-${p.id}`)
+        .addEventListener("click", abrirModalDespues);
+      document.getElementById(`intro-vid-${p.id}`)
+        .addEventListener("ended", abrirModalDespues);
+    }
+    // soloVideo → lo maneja completamente mostrarIntroYoutube, no crear nada acá
+
+    // ── Modal principal — solo si no es soloVideo ──
+    if (!p.soloVideo) {
+      const overlay = document.createElement("div");
+      overlay.className = "overlay-buu";
+      overlay.id = `overlay-${p.id}`;
+      overlay.innerHTML = `
+        <article class="buu-card">
+          <img src="${p.fondo}" alt="fondo" class="buu-fondo">
+          <img src="${p.personaje}" alt="${p.id}" class="buu-personaje">
+          <div class="buu-mensaje">
+            <div class="buu-titulo">${p.titulo}</div>
+            <div class="buu-texto">${p.texto}</div>
+          </div>
+        </article>
+        <button class="buu-cerrar" id="${p.id}-cerrar">✕ Cerrar</button>
+      `;
+      container.appendChild(overlay);
+
+      const cerrar = () => {
+        overlay.classList.remove("visible");
+        if (overlay._audioPersonaje) {
+          overlay._audioPersonaje.pause();
+          overlay._audioPersonaje.currentTime = 0;
+          overlay._audioPersonaje = null;
+        }
+      };
+      document.getElementById(`${p.id}-cerrar`).addEventListener("click", cerrar);
+      overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+    }
+
   });
 }
 
+
+
+function mostrarIntroYoutube(p, onCerrar) {
+  let introOverlay = document.getElementById(`intro-yt-${p.id}`);
+
+  if (!introOverlay) {
+    introOverlay = document.createElement("div");
+    introOverlay.id = `intro-yt-${p.id}`;
+    introOverlay.style.cssText = `
+      position: fixed; inset: 0; background: rgba(0,0,0,0.96);
+      z-index: 400; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    `;
+
+    // ── Video ──
+    const videoWrap = document.createElement("div");
+    videoWrap.style.cssText = `
+      position: relative;
+      width: min(700px, 92vw);
+      aspect-ratio: 16/9;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    `;
+
+    const video = document.createElement("video");
+    video.id = `intro-video-${p.id}`;
+    video.style.cssText = `width:100%; height:100%; object-fit:contain; display:block;`;
+    video.setAttribute("playsinline", "");
+    // ← solo ponemos muted si el config lo pide
+    if (p.introMuted) video.setAttribute("muted", "");
+    video.innerHTML = `<source src="${p.introVideo}" type="video/mp4">`;
+    videoWrap.appendChild(video);
+
+    // ── Barra de progreso ──
+    const barra = document.createElement("div");
+    barra.style.cssText = `
+      position: absolute; bottom: 0; left: 0;
+      height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--rosa), var(--rosa-oscuro));
+      transition: width 0.25s linear;
+      pointer-events: none;
+    `;
+    videoWrap.appendChild(barra);
+    introOverlay.appendChild(videoWrap);
+
+    // ── Botón cerrar ──
+    const skipBtn = document.createElement("button");
+    skipBtn.id = `intro-skip-${p.id}`;
+    skipBtn.textContent = "✕  Cerrar y volver";
+    skipBtn.style.cssText = `
+      background: none;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.7);
+      border-radius: 30px;
+      padding: 0.55rem 1.6rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      font-family: 'Lato', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    `;
+    skipBtn.addEventListener("mouseenter", () => {
+      skipBtn.style.background = "rgba(255,255,255,0.1)";
+      skipBtn.style.color = "#fff";
+      skipBtn.style.borderColor = "rgba(255,255,255,0.7)";
+    });
+    skipBtn.addEventListener("mouseleave", () => {
+      skipBtn.style.background = "none";
+      skipBtn.style.color = "rgba(255,255,255,0.7)";
+      skipBtn.style.borderColor = "rgba(255,255,255,0.35)";
+    });
+    introOverlay.appendChild(skipBtn);
+    document.body.appendChild(introOverlay);
+  }
+
+  const video  = document.getElementById(`intro-video-${p.id}`);
+  const skipBtn = document.getElementById(`intro-skip-${p.id}`);
+  const barra  = introOverlay.querySelector("div > div"); // barra de progreso
+
+  // ── Mostrar overlay primero, arrancar video después ──
+  introOverlay.style.opacity = "1";
+  introOverlay.style.pointerEvents = "all";
+
+  video.currentTime = 0;
+  video.muted = false;        // ← forzar sin mute explícitamente
+  video.volume = 1.0;         // ← volumen al máximo
+
+  // Pausar música de fondo mientras corre el video
+  if (musicaActiva) {
+    const audioActivo = modoGamer ? audioGamer : modoSexy ? audioSexy : audio;
+    audioActivo.pause();
+  }
+
+  setTimeout(() => {
+    const promesa = video.play();
+    if (promesa !== undefined) {
+      promesa.catch(() => {
+        // Navegador bloqueó — última opción: pedirle al usuario que toque
+        const aviso = document.createElement("div");
+        aviso.style.cssText = `
+          position: absolute; inset: 0;
+          display: flex; align-items: center; justify-content: center;
+          background: rgba(0,0,0,0.7); cursor: pointer; z-index: 10;
+          font-family: 'Lato', sans-serif; color: #fff;
+          font-size: 1.1rem; letter-spacing: 0.05em;
+        `;
+        aviso.textContent = "▶  Tocá para reproducir";
+        introOverlay.querySelector("div").appendChild(aviso);
+        aviso.addEventListener("click", () => {
+          aviso.remove();
+          video.muted = false;
+          video.volume = 1.0;
+          video.play().catch(() => {});
+        }, { once: true });
+      });
+    }
+  }, 100);
+
+  // Pequeño delay para que el fade-in termine antes de que arranque
+  setTimeout(() => {
+    video.play().catch(() => {
+      // Si el browser bloquea sin mute, forzamos muted y reintentamos
+      video.muted = true;
+      video.play().catch(() => {});
+    });
+  }, 100);
+
+  // Barra de progreso en tiempo real
+  const actualizarBarra = () => {
+    if (!video.duration) return;
+    barra.style.width = (video.currentTime / video.duration * 100) + "%";
+  };
+  video.addEventListener("timeupdate", actualizarBarra);
+
+  // ── Cerrar limpio — solo cierra, no abre nada ──
+  const cerrar = () => {
+    video.pause();
+    video.currentTime = 0;
+    barra.style.width = "0%";
+    video.removeEventListener("timeupdate", actualizarBarra);
+    introOverlay.style.opacity = "0";
+    introOverlay.style.pointerEvents = "none";
+    campoSecreto.value = "";
+    introActiva = false;
+    skipBtn.removeEventListener("click", cerrar);
+    video.removeEventListener("ended", onVideoTerminado);
+    campoSecreto.removeEventListener("keydown", onEnter);
+    // Retomar música de fondo
+    if (musicaActiva) {
+      const audioActivo = modoGamer ? audioGamer : modoSexy ? audioSexy : audio;
+      audioActivo.play().catch(() => {});
+    }
+    onCerrar?.();
+  };
+
+  // ── Video termina → abre modal ──
+  // ── Video termina → solo cierra, sin modal ──
+  const onVideoTerminado = () => {
+    video.removeEventListener("timeupdate", actualizarBarra);
+    introOverlay.style.opacity = "0";
+    introOverlay.style.pointerEvents = "none";
+    skipBtn.removeEventListener("click", cerrar);
+    campoSecreto.removeEventListener("keydown", onEnter);
+
+    // Retomar música de fondo
+    if (musicaActiva) {
+      const audioActivo = modoGamer ? audioGamer : modoSexy ? audioSexy : audio;
+      audioActivo.play().catch(() => {});
+    }
+
+    campoSecreto.value = "";
+    introActiva = false;
+    onCerrar?.();
+    // ← sin abrirModalPersonaje, termina y ya
+  };
+
+  // ── Enter procesa la contraseña normalmente ──
+  const onEnter = (e) => {
+    if (e.key !== "Enter") return;
+    video.pause();
+    video.removeEventListener("timeupdate", actualizarBarra);
+    introOverlay.style.opacity = "0";
+    introOverlay.style.pointerEvents = "none";
+    skipBtn.removeEventListener("click", cerrar);
+    video.removeEventListener("ended", onVideoTerminado);
+    campoSecreto.removeEventListener("keydown", onEnter);
+    onCerrar?.();
+  };
+
+  skipBtn.addEventListener("click", cerrar);
+  video.addEventListener("ended", onVideoTerminado);
+  campoSecreto.addEventListener("keydown", onEnter);
+}
+
+
+
 function abrirPersonaje(id) {
-  const p = PERSONAJES.find(p => p.id === id);
+  const p = PERSONAJES.find(p => p.id === id);  // ← primero definir p
   if (!p) return;
+  if (p.soloVideo) return;                       // ← después chequear
+
+  if (p.introVideo) {
+    const introOverlay = document.getElementById(`intro-${p.id}`);
+    const vid = document.getElementById(`intro-video-${p.id}`);
+    introOverlay.style.opacity = "1";
+    introOverlay.style.pointerEvents = "all";
+    vid.currentTime = 0;
+    vid.play().catch(() => {});
+  } else {
+    abrirModalPersonaje(p);
+  }
+}
+
+// Función separada que abre el modal (usada directamente o después del video)
+function abrirModalPersonaje(p) {
   document.getElementById(`overlay-${p.id}`).classList.add("visible");
   if (p.confetti) lanzarConfetti(false);
+
   audioUnlock.currentTime = 0;
   audioUnlock.volume = 0.6;
   audioUnlock.play().catch(() => {});
+
+  if (p.audio) {
+    const audioPersonaje = new Audio(p.audio);
+    audioPersonaje.volume = 0.7;
+    audioPersonaje.play().catch(() => {});
+    document.getElementById(`overlay-${p.id}`)._audioPersonaje = audioPersonaje;
+  }
 }
 
 
@@ -1630,9 +1989,28 @@ function renderGrilla() {
     iniciarEfectoChispas();
     iniciarEfectoCustom();
     iniciarEfectoKi();
+      // Marcar cupones como vistos al hacer hover
+    document.querySelectorAll(".vale").forEach(card => {
+      card.addEventListener("mouseenter", () => {
+        const tituloEl = card.querySelector(".vale-titulo");
+        if (!tituloEl) return;
+        const v = todos.find(c => c.titulo === tituloEl.textContent.trim());
+        if (!v) return;
+
+        const vistos = JSON.parse(localStorage.getItem("cupones_vistos") || "[]");
+        const id = idCupon(v);
+        if (!vistos.includes(id)) {
+          vistos.push(id);
+          localStorage.setItem("cupones_vistos", JSON.stringify(vistos));
+          actualizarPuntosNuevos();
+        }
+      }, { once: true });
+    });
   }, 100);
   
 }
+
+
 
 
 /* ══════════════════════════════════════════════
@@ -2159,6 +2537,7 @@ renderGrilla();
 iniciarPersonajes();
 cargarCanjeados();
 actualizarContadorSecretos(); // ← agregar
+actualizarPuntosNuevos(); // ← agregar acá
 /* ══════════════════════════════════════════════
    CONTADOR DÍAS JUNTOS
    ══════════════════════════════════════════════ */
