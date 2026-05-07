@@ -247,6 +247,7 @@ const CUPONES_SEXY = [
   { emoji: "👀", titulo: "Cupón para un striptease",             descripcion: "Lo que pedís, te lo doy. Sin prisa.",                               efecto: ["efecto-aura-rose", "efecto-berenjenas", "efecto-tilt"] },
   { emoji: "🍓", titulo: "Cupón para una noche de exploración",  descripcion: "Vos mandás. Yo acepto todo lo que propongás.",                      efecto: [ "efecto-berenjenas", "efecto-tilt"] },
   { emoji: "❤️‍🔥", titulo: "Cupón para lamerte",  descripcion: "Te puedo lamer donde quieras, este cupon  tambien puede ser usado a la inversa",                      efecto: [ "efecto-berenjenas", "efecto-tilt", "efecto-aura-rose"] },
+  { emoji: "🥵", titulo: "Cupón de Foto Peligrosa",  descripcion: "Canjeable por una foto capaz de reiniciar el cerebro de cualquiera",                      efecto: [ "efecto-berenjenas", "efecto-tilt", "efecto-aura-rose"] },
 ];
 
 
@@ -1900,6 +1901,7 @@ function distancia(a, b) {
 function renderGrilla() {
   grilla.innerHTML = "";
 
+  const vistos = JSON.parse(localStorage.getItem("cupones_vistos") || "[]");
   const filtrados = todos.filter(v => {
     const esCanjeado = !!canjeados[idCupon(v)];
     if (filtroActual === "todos")        return v.tipo !== "gamer" && v.tipo !== "sexy";
@@ -1954,7 +1956,9 @@ function renderGrilla() {
     else                  div.classList.add("aura-romantica");
 
   div.innerHTML = `
+  
     <div class="vale-categoria-franja"></div>
+    ${!esCanj && !vistos.includes(idCupon(v)) ? `<span class="vale-punto-nuevo"></span>` : ""}
     ${esGamer ? `<span class="vale-badge">🎮 Gamer</span>` : ""}
     ${esSexy  ? `<span class="vale-badge badge-sexy">💋 Sex</span>` : ""}
     <button class="btn-canjear" data-idx="${idx}" ${esCanj ? "disabled" : ""}>Canjear</button>

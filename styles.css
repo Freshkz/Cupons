@@ -2017,3 +2017,24 @@ body.sexy-mode  .contador-secretos { color: rgba(255,128,170,0.6); }
   0%   { opacity: 0; transform: scale(1.04); }
   100% { opacity: 1; transform: scale(1); }
 }
+
+
+.vale-punto-nuevo {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 6px rgba(255,59,48,0.8);
+  z-index: 5;
+  animation: puntoPulso 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes puntoPulso {
+  0%, 100% { transform: translateX(-50%) scale(1);   opacity: 1; }
+  50%       { transform: translateX(-50%) scale(1.4); opacity: 0.6; }
+}
