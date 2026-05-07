@@ -711,7 +711,6 @@ let canjeados = JSON.parse(localStorage.getItem("cupones_canjeados_v3") || "{}")
 
 // REEMPLAZÁ la función cargarCanjeados() completa por esta:
 async function cargarCanjeados() {
-  // 1. Render inmediato con localStorage
   renderGrilla();
 
   try {
@@ -727,14 +726,17 @@ async function cargarCanjeados() {
     const data = await res.json();
     const remoto = data.record || {};
 
-    // Sincronizar cupones canjeados
-    const canjeadosRemoto = remoto.canjeados || {};
+    // ← detectar formato viejo (objeto plano) vs nuevo (con wrapper)
+    const canjeadosRemoto = remoto.canjeados !== undefined 
+      ? remoto.canjeados 
+      : (typeof remoto === "object" && !remoto.secretos ? remoto : {});
+
+    const secretosRemoto = remoto.secretos || [];
+
     const hayDiferenciasCupones = Object.keys(canjeadosRemoto).some(k => !canjeados[k]);
     Object.assign(canjeados, canjeadosRemoto);
     localStorage.setItem("cupones_canjeados_v3", JSON.stringify(canjeados));
 
-    // Sincronizar secretos descubiertos
-    const secretosRemoto = remoto.secretos || [];
     const hayDiferenciasSecretos = secretosRemoto.some(s => !secretosDescubiertos.includes(s));
     secretosRemoto.forEach(s => {
       if (!secretosDescubiertos.includes(s)) secretosDescubiertos.push(s);
