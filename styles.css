@@ -2038,3 +2038,143 @@ body.sexy-mode  .contador-secretos { color: rgba(255,128,170,0.6); }
   0%, 100% { transform: translateX(-50%) scale(1);   opacity: 1; }
   50%       { transform: translateX(-50%) scale(1.4); opacity: 0.6; }
 }
+
+
+
+/* ── Fix bordes raros con punto nuevo ── */
+.vale {
+  isolation: isolate;
+}
+
+.vale-punto-nuevo {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 6px rgba(255,59,48,0.8);
+  z-index: 5;
+  animation: puntoPulso 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes puntoPulso {
+  0%, 100% { transform: translateX(-50%) scale(1);   opacity: 1; }
+  50%       { transform: translateX(-50%) scale(1.4); opacity: 0.6; }
+}
+
+
+
+
+
+
+
+
+
+
+/* ── Fix muesca negra en modo sexy ── */
+body.sexy-mode .vale::after {
+  background:
+    radial-gradient(circle at 0%   50%, #1a0010 8px, transparent 8px),
+    radial-gradient(circle at 100% 50%, #1a0010 8px, transparent 8px);
+}
+
+body.sexy-mode .vale:hover::after {
+  background:
+    radial-gradient(circle at 0%   50%, var(--sexy-bg) 8px, transparent 8px),
+    radial-gradient(circle at 100% 50%, var(--sexy-bg) 8px, transparent 8px);
+}
+
+/* ── Fix efecto que se sale de la carta ── */
+.vale.efecto-corazones,
+.vale.efecto-berenjenas,
+.vale.efecto-pixels,
+.vale.efecto-golden,
+.vale.efecto-aura-corazones,
+.vale.efecto-chispas,
+.vale.efecto-ki {
+  overflow: visible !important;
+  /* clip solo el cuerpo interior, no la card entera */
+}
+
+.vale.efecto-corazones .vale-cuerpo,
+.vale.efecto-berenjenas .vale-cuerpo,
+.vale.efecto-pixels .vale-cuerpo {
+  overflow: hidden;
+}
+
+/* ── Fix franja categoria desincronizada ── */
+.vale-categoria-franja {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+  pointer-events: none;
+  z-index: 6;  /* ← más alto que el punto nuevo */
+}
+
+/* ── Fix cupones cotidianos borde raro ── */
+.vale.cotidiano::before {
+  border-color: var(--cot-azul) !important;
+  opacity: 0 !important;  /* solo aparece en hover */
+}
+.vale.cotidiano:hover::before {
+  opacity: 0.35 !important;
+}
+
+
+
+
+
+
+/* ── CUPÓN SORPRESA ── */
+.sorpresa-real {
+  display: none;
+}
+
+.sorpresa-cuerpo {
+  filter: blur(0px);
+  transition: filter 0.4s ease;
+  cursor: pointer;
+}
+
+.vale:hover .sorpresa-cuerpo {
+  filter: blur(0px);
+}
+
+/* El emoji de sorpresa tiembla suavemente */
+.sorpresa-emoji {
+  animation: sorpresaTemblor 2s ease-in-out infinite;
+}
+@keyframes sorpresaTemblor {
+  0%, 100% { transform: rotate(-5deg) scale(1);   }
+  25%       { transform: rotate(5deg)  scale(1.1); }
+  50%       { transform: rotate(-3deg) scale(1);   }
+  75%       { transform: rotate(3deg)  scale(1.05); }
+}
+
+/* Al hover — revelar contenido */
+.vale:hover .sorpresa-tapado {
+  display: none;
+}
+.vale:hover .sorpresa-real {
+  display: block;
+  animation: sorpresaReveal 0.4s ease forwards;
+}
+.vale:hover .sorpresa-emoji {
+  animation: none;  /* para el temblor al revelar */
+}
+
+@keyframes sorpresaReveal {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.95); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0)   scale(1);    filter: blur(0px); }
+}
+
+/* El emoji real también aparece con animación */
+.vale:hover .vale-emoji .vale-emoji-img,
+.vale:hover .vale-emoji {
+  animation: sorpresaReveal 0.35s ease forwards;
+}

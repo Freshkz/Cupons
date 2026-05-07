@@ -66,6 +66,16 @@ const CONFIG_TEMPORIZADOR = {
       tamaño: "1.4rem",
       modo: "pixel",
     },
+
+    "Cupón Sorpresa": {
+      items: ["img/signo_interrogacion.png","❓"],
+      cantidad: 5,
+      tamaño: "1.4rem",
+      modo: "",
+    },
+
+
+
     // Para agregar otro cupón:
     // "Título exacto del cupón": {
     //   items: ["img/tuimagen.png", "🔥", "✨"],
@@ -234,7 +244,7 @@ const CUPONES_ROMANTICOS = [
   { emoji: "img/goku-run.gif", emojiBackup: "🏃", titulo: "Cupón para Ir a verte",          descripcion: "Este cupón activa modo: no aguanto más y voy a verte",             efecto: ["efecto-corazones", "efecto-glow"] },
   { emoji: "📸", titulo: "Cupón para Sesión de fotos obligatoria", descripcion: "Este cupón te obliga a sacarte fotos conmigo. no importa si decis que salis mal, si no queres  y si te haces el dificil",             efecto: ["efecto-corazones", "efecto-sparkle"] },
   { emoji: "👂", titulo: "Cupón para mandarte un audio largo",   descripcion: "Te mando un audio de lo que pienso cuando no te lo digo. Sin resumir.", efecto: ["efecto-aura-corazones", "efecto-sparkle"] },
-
+  { emoji: "❓", titulo: "Cupón Sorpresa",   descripcion: "ESTE CUPON NO HACE NADA.... ˢⁱ ᵖᵒˢᵗᵃ ⁿᵒ ʰᵃᶜᵉ ⁿᵃᵈᵃ", efecto: [ "efecto-sparkle", "efecto-magnetico"], sorpresa: true },
 ];
 
 const CUPONES_SEXY = [
@@ -1332,7 +1342,12 @@ function iniciarEfectoCustom() {
     const tituloEl = card.querySelector(".vale-titulo");
     if (!tituloEl) return;
 
-    const titulo = tituloEl.textContent.trim();
+    // ← Si tiene sorpresa-real, usar ese texto; sino el texto normal
+    const sorpresaReal = tituloEl.querySelector(".sorpresa-real");
+    const titulo = sorpresaReal 
+      ? sorpresaReal.textContent.trim() 
+      : tituloEl.textContent.trim();
+
     const config = EFECTOS_CUSTOM[titulo];
     if (!config) return;
 
@@ -1955,22 +1970,32 @@ function renderGrilla() {
     else if (esCotidiano) div.classList.add("aura-cotidiana");
     else                  div.classList.add("aura-romantica");
 
+  const esSorpresa = v.sorpresa && !esCanj;  // ← ya canjeado = ya no es sorpresa
+
   div.innerHTML = `
-  
     <div class="vale-categoria-franja"></div>
     ${!esCanj && !vistos.includes(idCupon(v)) ? `<span class="vale-punto-nuevo"></span>` : ""}
     ${esGamer ? `<span class="vale-badge">🎮 Gamer</span>` : ""}
     ${esSexy  ? `<span class="vale-badge badge-sexy">💋 Sex</span>` : ""}
     <button class="btn-canjear" data-idx="${idx}" ${esCanj ? "disabled" : ""}>Canjear</button>
-    <div class="vale-cuerpo">
-      <div class="vale-emoji">
-        ${v.emoji.includes("/") || v.emoji.endsWith(".png") || v.emoji.endsWith(".jpg") || v.emoji.endsWith(".webp") || v.emoji.endsWith(".gif")
-          ? `<img src="${v.emoji}" alt="emoji" class="vale-emoji-img" onerror="this.replaceWith(document.createTextNode('${v.emojiBackup || '✨'}'))">`
-          : v.emoji
+    <div class="vale-cuerpo ${esSorpresa ? "sorpresa-cuerpo" : ""}">
+      <div class="vale-emoji ${esSorpresa ? "sorpresa-emoji" : ""}">
+        ${esSorpresa ? "❓" : 
+          v.emoji.includes("/") || v.emoji.endsWith(".png") || v.emoji.endsWith(".jpg") || v.emoji.endsWith(".webp") || v.emoji.endsWith(".gif")
+            ? `<img src="${v.emoji}" alt="emoji" class="vale-emoji-img" onerror="this.replaceWith(document.createTextNode('${v.emojiBackup || '✨'}'))">`
+            : v.emoji
         }
       </div>
-      <div class="vale-titulo">${v.titulo}</div>
-      ${v.descripcion ? `<div class="vale-descripcion">${v.descripcion}</div>` : ""}
+      <div class="vale-titulo">
+        ${esSorpresa ? `<span class="sorpresa-tapado">??? Cupón Sorpresa ???</span>
+                        <span class="sorpresa-real">${v.titulo}</span>` 
+                    : v.titulo}
+      </div>
+      <div class="vale-descripcion">
+        ${esSorpresa ? `<span class="sorpresa-tapado">Pasa el mouse por aca para descubrir qué es...</span>
+                        <span class="sorpresa-real">${v.descripcion || ""}</span>`
+                    : (v.descripcion || "")}
+      </div>
     </div>
     <div class="sello">Canjeado ♥</div>
     <div class="vale-tachado"></div>
