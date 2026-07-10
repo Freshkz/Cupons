@@ -2782,3 +2782,220 @@ body.gamer-mode #goku-texto { color: var(--gamer-accent); }
   background: rgba(255,100,150,0.1);
   color: rgba(255,200,220,0.95);
 }
+
+
+/* ─── CINEMÁTICA AÑO 1 ──────────────────────────── */
+.cinematica-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1s ease;
+}
+.cinematica-overlay.oculto { display: none; }
+.cinematica-overlay.saliendo { opacity: 0; pointer-events: none; }
+
+/* Barra de progreso cinematográfica */
+.cinematica-barra {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff6090, #ffb8d0);
+  width: 0%;
+  transition: width linear;
+  z-index: 10;
+}
+
+/* Slide base */
+.cinematica-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.cinematica-slide.visible { opacity: 1; }
+
+/* Slide de texto puro */
+.cin-texto-wrap {
+  text-align: center;
+  z-index: 2;
+  padding: 2rem;
+}
+.cin-texto-pre {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,150,180,0.6);
+  margin-bottom: 1.5rem;
+  animation: cinFadeIn 1s ease forwards;
+}
+.cin-texto-main {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
+  color: #fff;
+  line-height: 1.2;
+  animation: cinFadeIn 1.2s ease 0.3s both;
+  font-weight: 400;
+}
+.cin-texto-sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  color: rgba(255,190,210,0.7);
+  margin-top: 1rem;
+  animation: cinFadeIn 1s ease 0.8s both;
+}
+
+/* Slide de foto */
+.cin-foto-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.cin-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.35);
+  transform: scale(1.05);
+  animation: cinKenBurns 8s ease forwards;
+}
+@keyframes cinKenBurns {
+  from { transform: scale(1.05); }
+  to   { transform: scale(1.12); }
+}
+.cin-foto-contenido {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 3rem 2rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+  text-align: center;
+}
+.cin-foto-mes {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,150,180,0.7);
+  margin-bottom: 0.75rem;
+  animation: cinFadeIn 1s ease 0.5s both;
+}
+.cin-foto-frase {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+  color: rgba(255,220,235,0.9);
+  line-height: 1.7;
+  max-width: 500px;
+  animation: cinFadeIn 1s ease 0.8s both;
+}
+
+/* Slide final — fuegos artificiales */
+.cin-final-wrap {
+  text-align: center;
+  z-index: 2;
+  padding: 2rem;
+  position: relative;
+}
+.cin-final-numero {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(5rem, 18vw, 10rem);
+  background: linear-gradient(135deg, #fff 0%, #ffb8d0 40%, #ff6090 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  filter: drop-shadow(0 0 40px rgba(255,100,150,0.6));
+  animation: cinNumeroEntrada 1s cubic-bezier(.175,.885,.32,1.275) forwards, cinNumeroPulso 2s ease-in-out 1s infinite;
+}
+@keyframes cinNumeroEntrada {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes cinNumeroPulso {
+  0%, 100% { filter: drop-shadow(0 0 30px rgba(255,100,150,0.5)); }
+  50%       { filter: drop-shadow(0 0 70px rgba(255,100,150,0.9)); }
+}
+.cin-final-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: rgba(255,220,235,0.95);
+  margin: 0.5rem 0 1rem;
+  animation: cinFadeIn 1s ease 0.5s both;
+}
+.cin-final-frase {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
+  color: rgba(255,190,210,0.8);
+  line-height: 1.8;
+  max-width: 420px;
+  margin: 0 auto 2rem;
+  animation: cinFadeIn 1s ease 0.8s both;
+}
+.cin-final-btn {
+  background: linear-gradient(135deg, #b01050, #e0306a, #ff6090);
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 3rem;
+  color: #fff;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 8px 30px rgba(176,16,80,0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: cinFadeIn 1s ease 1.2s both;
+}
+.cin-final-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 14px 40px rgba(176,16,80,0.7);
+}
+
+/* Fuegos artificiales */
+.cin-fuego {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+}
+.cin-fuego-chispa {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: cinChispa ease-out forwards;
+}
+@keyframes cinChispa {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--fx), var(--fy)) scale(0); opacity: 0; }
+}
+
+@keyframes cinFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Barras cinematográficas arriba y abajo */
+.cin-barras-top,
+.cin-barras-bottom {
+  position: fixed;
+  left: 0; right: 0;
+  height: 60px;
+  background: #000;
+  z-index: 5;
+  pointer-events: none;
+}
+.cin-barras-top { top: 0; }
+.cin-barras-bottom { bottom: 0; }

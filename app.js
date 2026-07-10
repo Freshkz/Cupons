@@ -1863,7 +1863,7 @@ const RESPUESTAS_MALAS = [
   "😒 qué creativo, de verdad",
   "🙄 intentá con algo un poco más romántico, conchudita",
   "💅 no, siguiente",
-  "Que te pasa la salame❓",
+  "Que te pasa salame❓",
   "🫵 eso habla más de vos que de la página",
   "💸 Muy jochis",
 ];
@@ -2637,13 +2637,225 @@ const FRASES_ANIVERSARIO = {
   13: "Un año y un mes. Seguimos creando recuerdos, aprendiendo juntos y disfrutando de tenernos el uno al otro 💕",
 };
 
+
+/* ══════════════════════════════════════════════
+   CINEMÁTICA — UN AÑO JUNTOS (mes 12)
+   ══════════════════════════════════════════════ */
+function mostrarCinematica() {
+  const overlay = document.getElementById("cinematica-overlay");
+  const slide   = document.getElementById("cinematica-slide");
+  const barra   = document.getElementById("cinematica-barra");
+  if (!overlay) return;
+
+  // Audio cinematográfico
+  const audioEpico = new Audio("experience.mp3");
+  audioEpico.volume = 0.4;
+  audioEpico.play().catch(() => {});
+
+  // Pausar música normal
+  audio.pause();
+
+  // Barras cinematográficas
+  const barraTop = document.createElement("div");
+  barraTop.className = "cin-barras-top";
+  const barraBot = document.createElement("div");
+  barraBot.className = "cin-barras-bottom";
+  overlay.appendChild(barraTop);
+  overlay.appendChild(barraBot);
+
+  overlay.classList.remove("oculto");
+
+  // Definición de slides
+  const SLIDES = [
+    // Slide 0 — intro texto
+    {
+      tipo: "texto",
+      duracion: 4000,
+      pre: "hace un año",
+      main: "Todo empezó con un mensaje",
+      sub: "y cambió todo para siempre.",
+    },
+    // Slide 1 — foto 1
+    {
+      tipo: "foto",
+      duracion: 6000,
+      foto: "img/especial/foto1.jpg",
+      mes: "el principio",
+      frase: FRASES_ANIVERSARIO[1],
+    },
+    // Slide 2 — texto transición
+    {
+      tipo: "texto",
+      duracion: 3500,
+      pre: "seis meses después",
+      main: "Ya no me imaginaba sin vos",
+      sub: "",
+    },
+    // Slide 3 — foto 2
+    {
+      tipo: "foto",
+      duracion: 6000,
+      foto: "img/especial/foto2.jpg",
+      mes: "mes 6 — medio año",
+      frase: FRASES_ANIVERSARIO[6],
+    },
+    // Slide 4 — foto 3
+    {
+      tipo: "foto",
+      duracion: 6000,
+      foto: "img/especial/foto3.jpg",
+      mes: "y seguimos",
+      frase: FRASES_ANIVERSARIO[9],
+    },
+    // Slide 5 — texto transición final
+    {
+      tipo: "texto",
+      duracion: 3500,
+      pre: "y hoy",
+      main: "Un año juntos",
+      sub: "gracias por cada día.",
+    },
+    // Slide 6 — FINAL
+    { tipo: "final", duracion: 0 },
+  ];
+
+  let slideActual = 0;
+  let timerSlide  = null;
+
+  function mostrarSlide(idx) {
+    const s = SLIDES[idx];
+    if (!s) return;
+
+    // Fade out
+    slide.classList.remove("visible");
+
+    setTimeout(() => {
+      slide.innerHTML = "";
+
+      if (s.tipo === "texto") {
+        slide.innerHTML = `
+          <div class="cin-texto-wrap">
+            ${s.pre ? `<div class="cin-texto-pre">${s.pre}</div>` : ""}
+            <div class="cin-texto-main">${s.main}</div>
+            ${s.sub ? `<div class="cin-texto-sub">${s.sub}</div>` : ""}
+          </div>
+        `;
+      } else if (s.tipo === "foto") {
+        slide.innerHTML = `
+          <div class="cin-foto-wrap">
+            <img src="${s.foto}" class="cin-foto" onerror="this.style.display='none'">
+          </div>
+          <div class="cin-foto-contenido">
+            <div class="cin-foto-mes">${s.mes}</div>
+            <div class="cin-foto-frase">${s.frase}</div>
+          </div>
+        `;
+      } else if (s.tipo === "final") {
+        slide.innerHTML = `
+          <div class="cin-final-wrap">
+            <div class="cin-final-numero">1</div>
+            <div class="cin-final-titulo">Un año juntos 🎊</div>
+            <div class="cin-final-frase">${FRASES_ANIVERSARIO[12]}</div>
+            <button class="cin-final-btn" id="cin-final-btn">Entrar ♥</button>
+          </div>
+        `;
+
+        // Contador del final: cuenta de 0 a 1 (año)
+        const numEl = slide.querySelector(".cin-final-numero");
+        setTimeout(() => {
+          numEl.style.transition = "all 0.3s ease";
+          numEl.textContent = "1";
+          numEl.style.transform = "scale(1.1)";
+          setTimeout(() => numEl.style.transform = "scale(1)", 300);
+        }, 500);
+
+        // Fuegos artificiales
+        setTimeout(() => lanzarFuegosArtificiales(), 600);
+        setTimeout(() => lanzarFuegosArtificiales(), 1400);
+        setTimeout(() => lanzarFuegosArtificiales(), 2200);
+        lanzarConfetti(false);
+
+        // Botón cerrar cinemática
+        setTimeout(() => {
+          const btnFinal = document.getElementById("cin-final-btn");
+          if (btnFinal) {
+            btnFinal.addEventListener("click", () => {
+              audioEpico.pause();
+              overlay.classList.add("saliendo");
+              barraTop.remove();
+              barraBot.remove();
+              setTimeout(() => {
+                overlay.classList.add("oculto");
+                overlay.classList.remove("saliendo");
+                // Mostrar pantalla de aniversario normal después
+                mostrarAniversario();
+              }, 1000);
+            });
+          }
+        }, 500);
+      }
+
+      // Barra de progreso del slide
+      barra.style.transition = "none";
+      barra.style.width = "0%";
+      setTimeout(() => {
+        barra.style.transition = `width ${s.duracion}ms linear`;
+        barra.style.width = "100%";
+      }, 100);
+
+      slide.classList.add("visible");
+
+      // Avanzar al siguiente slide automáticamente
+      if (s.tipo !== "final") {
+        timerSlide = setTimeout(() => {
+          slideActual++;
+          mostrarSlide(slideActual);
+        }, s.duracion);
+      }
+    }, 600);
+  }
+
+  mostrarSlide(0);
+}
+
+// Fuegos artificiales
+function lanzarFuegosArtificiales() {
+  const colores = ["#ff6090","#ffb8d0","#fff","#ff2d6b","#ffee00","#ff80d4"];
+  for (let f = 0; f < 5; f++) {
+    setTimeout(() => {
+      const x = 15 + Math.random() * 70;
+      const y = 10 + Math.random() * 50;
+      const cont = document.createElement("div");
+      cont.className = "cin-fuego";
+      cont.style.left = x + "vw";
+      cont.style.top  = y + "vh";
+      document.body.appendChild(cont);
+
+      for (let i = 0; i < 20; i++) {
+        const chispa = document.createElement("div");
+        chispa.className = "cin-fuego-chispa";
+        const angulo = (360 / 20) * i;
+        const dist   = 40 + Math.random() * 80;
+        const rad    = angulo * Math.PI / 180;
+        chispa.style.background = colores[Math.floor(Math.random() * colores.length)];
+        chispa.style.setProperty("--fx", `${Math.cos(rad) * dist}px`);
+        chispa.style.setProperty("--fy", `${Math.sin(rad) * dist}px`);
+        chispa.style.animationDuration = (0.6 + Math.random() * 0.8) + "s";
+        cont.appendChild(chispa);
+      }
+      setTimeout(() => cont.remove(), 1500);
+    }, f * 200);
+  }
+}
+
+
 /* ══════════════════════════════════════════════
    PANTALLA ANIVERSARIO — aparece el día 29
    ══════════════════════════════════════════════ */
 function mostrarAniversario() {
   const ahora  = new Date();
   const diaHoy = ahora.getDate();
-  if (diaHoy !== 29) return;
+  //if (diaHoy !== 29) return;
 
   const KEY = "aniversario_visto";
   const HOY = ahora.toDateString();
@@ -2658,6 +2870,11 @@ function mostrarAniversario() {
   if (ahora.getDate() < 29) meses--;
   meses = Math.max(1, meses);
 
+    // Si es el mes 12, mostrar cinemática primero
+  if (meses === 12) {
+    mostrarCinematica();
+    return;
+  }
   const titulos = {
     1: "¡Un mes juntos! 🎉", 2: "¡Dos meses juntos! 💕",
     3: "¡Tres meses juntos! 💜", 6: "¡Medio año juntos! 🎊",
