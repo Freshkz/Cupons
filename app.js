@@ -2635,7 +2635,7 @@ function verificarReinicioCupones() {
   if (debeReiniciar) {
     Object.keys(canjeados).forEach(k => delete canjeados[k]);
     localStorage.removeItem("cupones_canjeados_v3");
-    localStorage.removeItem("cupones_vistos");
+    
 
     guardarCanjeados().catch(err => console.warn("JSONBin reinicio error:", err));
 
