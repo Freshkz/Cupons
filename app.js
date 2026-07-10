@@ -2615,6 +2615,257 @@ actualizarContadorSecretos(); // ← agregar
 actualizarPuntosNuevos(); // ← agregar acá
 
 
+
+
+
+/* ══════════════════════════════════════════════
+   FRASES DE ANIVERSARIO — una por mes
+   ══════════════════════════════════════════════ */
+const FRASES_ANIVERSARIO = {
+  1:  "Un mes juntos y todavía me sorprende lo feliz que me hace compartir mi tiempo con vos. Gracias por llegar a mi vida 💕",
+  2:  "Dos meses y descubrí que además de ser alguien especial, sos alguien con quien puedo ser yo mismo ✨",
+  3:  "Tres meses juntos. Me encanta que podamos compartir nuestras pasiones, nuestros juegos y nuestras pequeñas aventuras 💜",
+  4:  "Cuatro meses y sigo pensando que una de las mejores cosas de nosotros es lo fácil que se siente estar juntos 🌸",
+  5:  "Cinco meses. Cada día conozco una parte nueva de vos y cada una me hace apreciarte más 💫",
+  6:  "Seis meses juntos. Gracias por cada detalle, cada conversación y cada momento donde me hiciste sentir querido 🎉",
+  7:  "Siete meses y aprendí que una persona puede convertirse en un lugar donde uno se siente acompañado y tranquilo 💕",
+  8:  "Ocho meses. Me encanta que podamos reírnos, jugar juntos y disfrutar incluso de las cosas más simples ✨",
+  9:  "Nueve meses juntos y sigo valorando la suerte de haber encontrado a alguien tan cariñosa, atenta y especial 💜",
+  10: "Diez meses. Todo lo que construimos juntos demuestra que no solo compartimos gustos, también compartimos una conexión muy bonita 🌸",
+  11: "Once meses. Casi un año de recuerdos, risas, juegos, conversaciones y momentos que siempre voy a guardar 💫",
+  12: "Un año juntos. Gracias por ser una persona tan increíble, por cuidarme, acompañarme y hacer que mi vida sea más bonita 🎊",
+  13: "Un año y un mes. Seguimos creando recuerdos, aprendiendo juntos y disfrutando de tenernos el uno al otro 💕",
+};
+
+/* ══════════════════════════════════════════════
+   PANTALLA ANIVERSARIO — aparece el día 29
+   ══════════════════════════════════════════════ */
+function mostrarAniversario() {
+  const ahora  = new Date();
+  const diaHoy = ahora.getDate();
+  if (diaHoy !== 29) return;
+
+  const KEY = "aniversario_visto";
+  const HOY = ahora.toDateString();
+  if (localStorage.getItem(KEY) === HOY) return;
+
+  const overlay = document.getElementById("aniversario-overlay");
+  if (!overlay) return;
+
+  // Calcular meses
+  const INICIO = new Date("2025-08-29");
+  let meses = (ahora.getFullYear() - INICIO.getFullYear()) * 12 + (ahora.getMonth() - INICIO.getMonth());
+  if (ahora.getDate() < 29) meses--;
+  meses = Math.max(1, meses);
+
+  const titulos = {
+    1: "¡Un mes juntos! 🎉", 2: "¡Dos meses juntos! 💕",
+    3: "¡Tres meses juntos! 💜", 6: "¡Medio año juntos! 🎊",
+    12: "¡Un año juntos! 🎆",
+  };
+  const titulo = titulos[meses] || `¡${meses} meses juntos! 💕`;
+  const frase  = FRASES_ANIVERSARIO[meses] || FRASES_ANIVERSARIO[13] || "Gracias por cada mes junto a vos 💕";
+
+  document.getElementById("aniversario-titulo").textContent = titulo;
+  document.getElementById("aniversario-fecha").textContent = `feliz ${meses} ${meses === 1 ? "mes" : "meses"}, mi amor ♥`;
+
+  // Rayos de luz
+  const rayosEl = document.createElement("div");
+  rayosEl.className = "aniversario-rayos";
+  for (let i = 0; i < 12; i++) {
+    const r = document.createElement("div");
+    r.className = "aniversario-rayo";
+    const angulo = (360 / 12) * i;
+    r.style.transform       = `rotate(${angulo}deg)`;
+    r.style.animationDelay  = `${i * 0.25}s`;
+    r.style.opacity         = (0.2 + Math.random() * 0.3) + "";
+    rayosEl.appendChild(r);
+  }
+  overlay.insertBefore(rayosEl, overlay.firstChild);
+
+  // Corazones flotantes
+  const cont  = document.getElementById("aniversario-corazones");
+  const items = ["♥","♡","💕","🌸","✨","💜","🌹","💫","❤️","🩷"];
+  for (let i = 0; i < 25; i++) {
+    const h = document.createElement("span");
+    h.className   = "aniversario-corazon";
+    h.textContent = items[Math.floor(Math.random() * items.length)];
+    h.style.left            = Math.random() * 100 + "vw";
+    h.style.fontSize        = (0.9 + Math.random() * 1.6) + "rem";
+    const dur               = 6 + Math.random() * 10;
+    h.style.animationDuration = dur + "s";
+    h.style.animationDelay  = (Math.random() * 5) + "s";
+    cont.appendChild(h);
+  }
+
+  // Mostrar overlay
+  overlay.classList.remove("oculto");
+  lanzarConfetti(false);
+
+  // Contador animado: cuenta desde 1 hasta meses
+  const numEl = document.getElementById("aniversario-numero");
+  numEl.textContent = "1";
+  let actual = 1;
+  const durTotal = Math.min(1800, meses * 120);
+  const intervalo = durTotal / meses;
+  const timer = setInterval(() => {
+    actual++;
+    numEl.textContent = actual;
+    if (actual >= meses) {
+      clearInterval(timer);
+      // Al llegar al número final, pequeño efecto
+      numEl.style.transform = "scale(1.15)";
+      setTimeout(() => numEl.style.transform = "scale(1)", 300);
+      // Arrancar frase y timeline después del contador
+      setTimeout(() => animarFrase(frase), 400);
+      setTimeout(() => animarTimeline(meses), 600);
+    }
+  }, intervalo);
+
+  // Frase por palabras
+  function animarFrase(texto) {
+    const fraseEl = document.getElementById("aniversario-frase");
+    fraseEl.innerHTML = "";
+    const palabras = texto.split(" ");
+    palabras.forEach((palabra, i) => {
+      const span = document.createElement("span");
+      span.className   = "aniversario-palabra";
+      span.textContent = palabra;
+      fraseEl.appendChild(span);
+      setTimeout(() => span.classList.add("visible"), i * 80);
+    });
+  }
+
+  // Timeline de meses
+  function animarTimeline(total) {
+    const timelineEl = document.getElementById("aniversario-timeline");
+    if (!timelineEl) return;
+    timelineEl.innerHTML = "";
+
+    const mostrar = Math.min(total, 13);
+    for (let i = 1; i <= mostrar; i++) {
+      const punto = document.createElement("div");
+      punto.className = "aniversario-mes";
+      punto.style.cursor = "pointer";
+      punto.title = `Mes ${i}`;
+
+      // Tooltip con frase al hacer click
+      punto.addEventListener("click", () => {
+        const fraseExistente = document.getElementById("aniversario-tooltip");
+        if (fraseExistente) fraseExistente.remove();
+
+        const fraseMes = FRASES_ANIVERSARIO[i] || "Un mes más juntos ♥";
+        const tooltip  = document.createElement("div");
+        tooltip.id     = "aniversario-tooltip";
+        tooltip.style.cssText = `
+          position: fixed;
+          bottom: 2rem;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(30,0,15,0.95);
+          border: 1px solid rgba(255,100,150,0.4);
+          border-radius: 14px;
+          padding: 1rem 1.5rem;
+          max-width: min(380px, 90vw);
+          text-align: center;
+          font-family: 'Playfair Display', serif;
+          font-style: italic;
+          font-size: 0.85rem;
+          color: rgba(255,190,210,0.9);
+          line-height: 1.7;
+          z-index: 1100;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+          animation: anivTooltipEntrada 0.3s cubic-bezier(.175,.885,.32,1.275) forwards;
+        `;
+        tooltip.innerHTML = `
+          <div style="font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,150,180,0.6);margin-bottom:0.5rem;">mes ${i}</div>
+          ${fraseMes}
+          <div style="font-size:0.7rem;color:rgba(255,150,180,0.4);margin-top:0.5rem;letter-spacing:0.1em;">click para cerrar</div>
+        `;
+        tooltip.addEventListener("click", () => tooltip.remove());
+        document.body.appendChild(tooltip);
+        setTimeout(() => tooltip.remove(), 6000);
+      });
+      timelineEl.appendChild(punto);
+
+      // Línea entre puntos
+      if (i < mostrar) {
+        const linea = document.createElement("div");
+        linea.className = "aniversario-timeline-linea";
+        timelineEl.appendChild(linea);
+
+        setTimeout(() => linea.classList.add("activa"), i * 120 + 200);
+      }
+
+      // Activar cada punto con delay
+      setTimeout(() => {
+        if (i < total) punto.classList.add("activo");
+      }, i * 120);
+    }
+  }
+
+  // Música
+  setTimeout(() => {
+    if (!musicaActiva) {
+      audio.play().then(() => {
+        musicaActiva = true;
+        document.getElementById("btn-musica").textContent = "🎶";
+        document.getElementById("btn-musica").classList.add("tocando");
+      }).catch(() => {});
+    }
+  }, 800);
+
+  // Botón
+  // Botón ver todos los meses
+document.getElementById("aniversario-btn-meses").addEventListener("click", () => {
+  // Crear panel
+  const panel = document.createElement("div");
+  panel.className = "aniversario-panel-meses";
+
+  const mesesDisponibles = Math.min(meses, Object.keys(FRASES_ANIVERSARIO).length);
+
+  panel.innerHTML = `
+    <div class="aniversario-panel-titulo">Nuestros meses juntos 💕</div>
+    <div class="aniversario-panel-sub">${meses} ${meses === 1 ? "mes" : "meses"} de historia</div>
+    <div class="aniversario-panel-lista" id="panel-lista"></div>
+    <button class="aniversario-panel-cerrar" id="panel-cerrar">Volver ♥</button>
+  `;
+
+  document.body.appendChild(panel);
+  setTimeout(() => panel.classList.add("visible"), 10);
+
+  // Llenar lista
+  const lista = panel.querySelector("#panel-lista");
+  for (let i = 1; i <= mesesDisponibles; i++) {
+    const item = document.createElement("div");
+    item.className = "aniversario-panel-item" + (i === meses ? " actual-mes" : "");
+    item.innerHTML = `
+      <div class="aniversario-panel-num">${i}</div>
+      <div>
+        <div class="aniversario-panel-mes-label">mes ${i} ${i === meses ? "— hoy 🌸" : ""}</div>
+        <div class="aniversario-panel-texto">${FRASES_ANIVERSARIO[i] || "Un mes más juntos ♥"}</div>
+      </div>
+    `;
+    lista.appendChild(item);
+    setTimeout(() => item.classList.add("visible"), i * 100);
+  }
+
+  // Cerrar panel
+  panel.querySelector("#panel-cerrar").addEventListener("click", () => {
+    panel.classList.remove("visible");
+    setTimeout(() => panel.remove(), 400);
+  });
+});
+  document.getElementById("aniversario-btn").addEventListener("click", () => {
+    overlay.classList.add("saliendo");
+    localStorage.setItem(KEY, HOY);
+    lanzarConfetti(false);
+    setTimeout(() => overlay.classList.add("oculto"), 800);
+  });
+}
+
+
 /* ══════════════════════════════════════════════
    REINICIO MENSUAL — día 29
    ══════════════════════════════════════════════ */
@@ -2847,3 +3098,5 @@ document.getElementById("goku-img").addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => iniciarGokuTutorial(), 2000);
 });
+
+mostrarAniversario();
