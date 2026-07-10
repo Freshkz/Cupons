@@ -846,7 +846,7 @@ function reproducirAudio(audioTarget) {
 
 
 // Claves que NO se cuentan como secretos (solo para el dev)
-const CLAVES_EXCLUIDAS = ["dev mode", "reset cupones", "amor", "tutorial"];
+const CLAVES_EXCLUIDAS = ["dev mode", "reset cupones", "amor", "tutorial",];
 
 function registrarSecreto(val) {
   if (CLAVES_EXCLUIDAS.includes(val)) return;
@@ -2855,7 +2855,7 @@ function lanzarFuegosArtificiales() {
 function mostrarAniversario() {
   const ahora  = new Date();
   const diaHoy = ahora.getDate();
-  //if (diaHoy !== 29) return;
+  if (diaHoy !== 29) return;
 
   const KEY = "aniversario_visto";
   const HOY = ahora.toDateString();
