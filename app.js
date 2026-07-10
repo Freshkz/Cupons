@@ -2613,6 +2613,51 @@ iniciarPersonajes();
 cargarCanjeados();
 actualizarContadorSecretos(); // ← agregar
 actualizarPuntosNuevos(); // ← agregar acá
+
+
+/* ══════════════════════════════════════════════
+   REINICIO MENSUAL — día 29
+   ══════════════════════════════════════════════ */
+function verificarReinicioCupones() {
+  const ahora   = new Date();
+  const diaHoy  = ahora.getDate();
+  const mesHoy  = ahora.getMonth();
+  const anioHoy = ahora.getFullYear();
+
+  const ultimoReinicio = JSON.parse(localStorage.getItem("ultimo_reinicio") || "null");
+
+  const debeReiniciar = diaHoy === CONFIG_TEMPORIZADOR.DIA_REINICIO && (
+    !ultimoReinicio ||
+    ultimoReinicio.mes  !== mesHoy  ||
+    ultimoReinicio.anio !== anioHoy
+  );
+
+  if (debeReiniciar) {
+    Object.keys(canjeados).forEach(k => delete canjeados[k]);
+    localStorage.removeItem("cupones_canjeados_v3");
+    localStorage.removeItem("cupones_vistos");
+
+    guardarCanjeados().catch(err => console.warn("JSONBin reinicio error:", err));
+
+    localStorage.setItem("ultimo_reinicio", JSON.stringify({
+      mes:  mesHoy,
+      anio: anioHoy,
+    }));
+
+    renderGrilla();
+    actualizarPuntosNuevos();
+    mostrarToast("✨ ¡Nuevo mes! Los cupones se renovaron 💕");
+    lanzarConfetti(false);
+  }
+}
+
+verificarReinicioCupones();
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    verificarReinicioCupones();
+  }
+});
 /* ══════════════════════════════════════════════
    CONTADOR DÍAS JUNTOS
    ══════════════════════════════════════════════ */
